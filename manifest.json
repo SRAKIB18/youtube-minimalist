@@ -1,0 +1,36 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Minimalist (Focus Mode)",
+  "version": "1.0.1",
+  "description": "YouTube-এর হোম ফিড, শর্টস ও রিলস হাইড করে কেবল সার্চ বার প্রদর্শন করে।",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "YouTube Focus Settings"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.youtube.com/*"
+      ],
+      "css": [
+        "styles.css"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

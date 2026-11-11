@@ -1,0 +1,81 @@
+/* ==========================================================================
+   1. HIDE YOUTUBE HOMEPAGE FEED (Only when data-hide-feed="true")
+   ========================================================================== */
+html[data-hide-feed="true"] ytd-browse[page-subtype="home"] #contents,
+html[data-hide-feed="true"] ytd-browse[page-subtype="home"] #primary ytd-rich-grid-renderer,
+html[data-hide-feed="true"] ytd-browse[page-subtype="home"] #chips-wrapper,
+html[data-hide-feed="true"] ytd-browse[page-subtype="home"] #feed-filter,
+html[data-hide-feed="true"] ytd-browse[page-subtype="home"] ytd-feed-filter-chip-bar-renderer {
+    display: none !important;
+}
+
+/* হোমপেজে সুন্দর ক্লিন ও সেন্ট্রাল ফোকাস ইন্টারফেস */
+html[data-hide-feed="true"] ytd-browse[page-subtype="home"] #page-manager {
+    display: flex !important;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+}
+
+/* ==========================================================================
+   2. HIDE SHORTS & REELS (Only when data-hide-shorts="true")
+   ========================================================================== */
+/* সাইডবারের Shorts বাটন */
+html[data-hide-shorts="true"] ytd-guide-entry-renderer:has(a[href^="/shorts"]),
+html[data-hide-shorts="true"] ytd-mini-guide-entry-renderer:has(a[href^="/shorts"]),
+html[data-hide-shorts="true"] ytd-guide-entry-renderer a[title="Shorts"],
+html[data-hide-shorts="true"] ytd-mini-guide-entry-renderer[aria-label="Shorts"],
+html[data-hide-shorts="true"] a#endpoint[title="Shorts"],
+
+/* সার্চ রেজাল্ট এবং ফিডের Shorts শেলফ/রিলস */
+html[data-hide-shorts="true"] ytd-reel-shelf-renderer,
+html[data-hide-shorts="true"] ytd-rich-shelf-renderer[is-shorts],
+html[data-hide-shorts="true"] ytd-rich-section-renderer:has(ytd-reel-shelf-renderer),
+html[data-hide-shorts="true"] ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
+
+/* চ্যানেল পেজের Shorts ট্যাব */
+html[data-hide-shorts="true"] yt-tab-shape[tab-title="Shorts"],
+
+/* ওয়াচ পেজে Shorts রিকমেন্ডেশন */
+html[data-hide-shorts="true"] #related ytd-reel-shelf-renderer,
+
+/* সার্চ রেজাল্ট এবং ফিডে আসা একক Shorts ভিডিওগুলোও হাইড রাখা */
+html[data-hide-shorts="true"] ytd-video-renderer:has(a[href*="/shorts/"]),
+html[data-hide-shorts="true"] ytd-grid-video-renderer:has(a[href*="/shorts/"]),
+html[data-hide-shorts="true"] ytd-compact-video-renderer:has(a[href*="/shorts/"]) {
+    display: none !important;
+}
+
+/* ==========================================================================
+   3. FOCUS MODE PLACEHOLDER (হোমপেজে সার্চ করার সুন্দর বার্তা)
+   ========================================================================== */
+.yt-focus-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin-top: 15vh;
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--yt-spec-text-primary, #0f0f0f);
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+.yt-focus-placeholder h2 {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.yt-focus-placeholder p {
+    font-size: 15px;
+    color: var(--yt-spec-text-secondary, #606060);
+    max-width: 440px;
+    line-height: 1.6;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
