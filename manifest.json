@@ -3,6 +3,7 @@
   "name": "YouTube Minimalist (Focus Mode)",
   "version": "1.0.1",
   "description": "YouTube-এর হোম ফিড, শর্টস ও রিলস হাইড করে কেবল সার্চ বার প্রদর্শন করে।",
+  "homepage_url": "https://github.com/SRAKIB18/youtube-minimalist",
   "permissions": [
     "storage",
     "activeTab"
