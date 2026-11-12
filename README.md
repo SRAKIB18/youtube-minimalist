@@ -18,7 +18,7 @@ YouTube's homepage and endless Shorts feed are engineered to keep you hooked and
 - 🚫 **No Home Feed:** You won't get trapped by clickbait thumbnails or algorithmic video recommendations.
 - 🚫 **No Shorts & Reels:** Shorts are hidden everywhere — navigation bar, search results, channel tabs, and watch pages.
 - 🔍 **Top Search Bar Preserved:** Only the top search bar is visible, keeping the interface minimal and distraction-free.
-- 📖 **Daily Hadith & Wisdom (বাংলায় সহীহ হাদিস):** Displays inspiring Hadith on time, intentionality, and focus in Bengali.
+- 📖 **70+ Sahih Hadith Collection (বাংলায় ৭০+ সহীহ হাদিস):** Displays authentic, motivational Hadith on time management, hard work, patience, and intentional focus.
 - ⌨️ **Quick Search Hotkey (`/`):** Press `/` on your keyboard anywhere on the page to focus the search bar immediately.
 - ⚡ **Instant Live Toggle:** Need to check your subscriptions or feed? Turn it on or off in real-time from the extension popup with **zero page reloads**.
 
