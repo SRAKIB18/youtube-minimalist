@@ -684,13 +684,25 @@ function injectPlaceholder() {
 
             <!-- কীবোর্ড শর্টকাট গাইড -->
             <div class="yt-focus-search-hint">
-                 কিবোর্ডে <kbd>/</kbd> চাপলে ওপরের সার্চ বারে সরাসরি কার্সর চলে যাবে
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;">
+                    <rect x="2" y="4" width="20" height="16" rx="2" ry="2"></rect>
+                    <line x1="6" y1="8" x2="6" y2="8"></line>
+                    <line x1="10" y1="8" x2="10" y2="8"></line>
+                    <line x1="14" y1="8" x2="14" y2="8"></line>
+                    <line x1="18" y1="8" x2="18" y2="8"></line>
+                    <line x1="6" y1="12" x2="6" y2="12"></line>
+                    <line x1="10" y1="12" x2="10" y2="12"></line>
+                    <line x1="14" y1="12" x2="14" y2="12"></line>
+                    <line x1="18" y1="12" x2="18" y2="12"></line>
+                    <line x1="7" y1="16" x2="17" y2="16"></line>
+                </svg>
+                কিবোর্ডে <kbd>/</kbd> চাপলে ওপরের সার্চ বারে সরাসরি কার্সর চলে যাবে
             </div>
         `;
         browse.prepend(card);
 
         // হোমপেজে স্ক্রিন টাইম তাৎক্ষণিক প্রদর্শন
-        const todayStr = new Date().toISOString().slice(0, 10);
+        const todayStr = getLocalDateString();
         if (isExtensionValid()) {
             chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
                 if (!isExtensionValid()) return;
@@ -740,7 +752,7 @@ window.addEventListener("keydown", (e) => {
 
     if (e.key === "/" && !isInputFocused) {
         e.preventDefault();
-        const topInput = document.querySelector("input#search, input.ytSearchboxComponentInput");
+        const topInput = document.querySelector("input#search, input.ytSearchboxComponentInput, ytd-searchbox input, input[name='search_query']");
         if (topInput) {
             topInput.focus();
             topInput.select();
@@ -823,7 +835,7 @@ function setupCommentsToggle() {
 // ১. দৈনিক কঠোর সময়সীমা এনফোর্সমেন্ট
 function checkDailyStrictLimit(todaySec) {
     if (!isExtensionValid()) return;
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayStr = getLocalDateString();
     const limitMin = Number(settings.dailyLimit) || 0;
 
     const removeOverlays = () => {
@@ -1113,20 +1125,49 @@ function updateFloatingPomodoroPill() {
             pill = document.createElement("div");
             pill.id = "yt-pomodoro-floating-pill";
             pill.className = "yt-pomo-floating-pill";
+            pill.innerHTML = `
+                <span class="pomo-float-dot"></span>
+                <span class="pomo-float-icon-wrap" style="display:inline-flex; align-items:center;"></span>
+                <span class="pomo-float-time"></span>
+                <button type="button" class="yt-pomo-float-btn" id="yt-pomo-float-toggle"></button>
+            `;
             document.body.appendChild(pill);
+
+            pill.querySelector("#yt-pomo-float-toggle").addEventListener("click", (e) => {
+                e.stopPropagation();
+                chrome.storage.local.get(["pomo_state", "pomo_remaining", "pomo_mode", "pomo_target_time"], (cur) => {
+                    if (!isExtensionValid()) return;
+                    const curState = cur.pomo_state || "idle";
+                    const curMode = cur.pomo_mode || "work";
+                    if (curState === "running") {
+                        const rem = Math.max(0, Math.round((cur.pomo_target_time - Date.now()) / 1000));
+                        chrome.storage.local.set({
+                            pomo_state: "paused",
+                            pomo_remaining: rem,
+                            pomo_target_time: null
+                        });
+                    } else {
+                        const defaultSec = curMode === "break" 
+                            ? ((settings.pomoBreakDuration || 5) * 60) 
+                            : ((settings.pomoWorkDuration || 25) * 60);
+                        const rem = cur.pomo_remaining !== undefined && cur.pomo_remaining > 0 ? cur.pomo_remaining : defaultSec;
+                        const target = Date.now() + (rem * 1000);
+                        chrome.storage.local.set({
+                            pomo_state: "running",
+                            pomo_remaining: rem,
+                            pomo_target_time: target,
+                            pomo_mode: curMode
+                        });
+                    }
+                });
+            });
         }
 
-        if (mode === "break") {
-            pill.classList.add("is-break");
-        } else {
-            pill.classList.remove("is-break");
-        }
+        if (mode === "break") pill.classList.add("is-break");
+        else pill.classList.remove("is-break");
 
-        if (state === "paused") {
-            pill.classList.add("is-paused");
-        } else {
-            pill.classList.remove("is-paused");
-        }
+        if (state === "paused") pill.classList.add("is-paused");
+        else pill.classList.remove("is-paused");
 
         const m = Math.floor(secondsLeft / 60);
         const s = secondsLeft % 60;
@@ -1140,35 +1181,22 @@ function updateFloatingPomodoroPill() {
             ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`
             : `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
 
-        pill.innerHTML = `
-            <span class="pomo-float-dot"></span>
-            <span style="display:inline-flex; align-items:center;">${floatModeIcon}</span>
-            <span class="pomo-float-time">${timeStr}</span>
-            <button type="button" class="yt-pomo-float-btn" id="yt-pomo-float-toggle" title="${state === 'running' ? 'পজ করুন' : 'চালু করুন'}">
-                ${floatToggleIcon}
-            </button>
-        `;
+        const iconWrap = pill.querySelector(".pomo-float-icon-wrap");
+        if (iconWrap && pill.dataset.mode !== mode) {
+            pill.dataset.mode = mode;
+            iconWrap.innerHTML = floatModeIcon;
+        }
+
+        const timeSpan = pill.querySelector(".pomo-float-time");
+        if (timeSpan && timeSpan.textContent !== timeStr) {
+            timeSpan.textContent = timeStr;
+        }
 
         const toggleBtn = pill.querySelector("#yt-pomo-float-toggle");
-        if (toggleBtn) {
-            toggleBtn.addEventListener("click", (e) => {
-                e.stopPropagation();
-                if (state === "running") {
-                    chrome.storage.local.set({
-                        pomo_state: "paused",
-                        pomo_remaining: secondsLeft,
-                        pomo_target_time: null
-                    });
-                } else {
-                    const target = Date.now() + (secondsLeft * 1000);
-                    chrome.storage.local.set({
-                        pomo_state: "running",
-                        pomo_remaining: secondsLeft,
-                        pomo_target_time: target,
-                        pomo_mode: mode
-                    });
-                }
-            });
+        if (toggleBtn && pill.dataset.state !== state) {
+            pill.dataset.state = state;
+            toggleBtn.innerHTML = floatToggleIcon;
+            toggleBtn.title = state === 'running' ? 'পজ করুন' : 'চালু করুন';
         }
     });
     } catch (e) {
