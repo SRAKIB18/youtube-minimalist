@@ -8,7 +8,7 @@
 
 > 🔗 **GitHub Repository:** [https://github.com/SRAKIB18/youtube-minimalist](https://github.com/SRAKIB18/youtube-minimalist)
 
-A lightweight, distraction-free **Google Chrome Extension (Manifest V3)** that eliminates algorithmic rabbit holes on YouTube — hiding the homepage newsfeed, shorts, and reels, leaving behind only a clean, functional search bar.
+A lightweight, distraction-free **Google Chrome Extension (Manifest V3)** that eliminates algorithmic rabbit holes on YouTube — replacing the chaotic home feed and infinite Shorts with a clean, Google-style centered search bar and daily motivational quotes.
 
 ---
 
@@ -17,13 +17,36 @@ A lightweight, distraction-free **Google Chrome Extension (Manifest V3)** that e
 YouTube's homepage and endless Shorts feed are engineered to keep you hooked and scrolling for hours. **YouTube Minimalist** reclaims your attention:
 - 🚫 **No Home Feed:** You won't get trapped by clickbait thumbnails or algorithmic video recommendations.
 - 🚫 **No Shorts & Reels:** Shorts are hidden everywhere — navigation bar, search results, channel tabs, and watch pages.
-- 🔍 **Intentional Searching:** The search bar remains fully active so you can search and watch only what you genuinely came for.
-- ⚡ **Instant Toggle:** Need to check your subscriptions or feed? Turn it on or off in real-time from the extension popup with **zero page reloads**.
+- 🔍 **Top Search Bar Preserved:** Only the top search bar is visible, keeping the interface minimal and distraction-free.
+- 📖 **Daily Hadith & Wisdom (বাংলায় সহীহ হাদিস):** Displays inspiring Hadith on time, intentionality, and focus in Bengali.
+- ⌨️ **Quick Search Hotkey (`/`):** Press `/` on your keyboard anywhere on the page to focus the search bar immediately.
+- ⚡ **Instant Live Toggle:** Need to check your subscriptions or feed? Turn it on or off in real-time from the extension popup with **zero page reloads**.
 
 ---
 
 ## 📸 Preview
-![Preview](image.png)
+
+```text
++---------------------------------------------------------------+
+|  [YouTube]            [   🔍 Search videos...       ] [Avatar]|
++---------------------------------------------------------------+
+|                                                               |
+|                        ● ফোকাস স্পেস                          |
+|                     সময়ের সদ্ব্যবহার করুন                     |
+|         অনর্থক বিষয় এড়িয়ে চলুন। যা প্রয়োজন ওপরের সার্চে খুঁজুন।       |
+|                                                               |
+|           ┌─────────────────────────────────────────┐         |
+|           │ ❝ মানুষের ইসলামের অন্যতম সৌন্দর্য হলো      │         |
+|           │    অনর্থক ও অপ্রয়োজনীয় বিষয় ত্যাগ করা।   │         |
+|           │                                         │         |
+|           │ — হাদিস: সুনান আত-তিরমিজি (২৩১৭)        │         |
+|           │                      [ ↻ পরবর্তী হাদিস ] │         |
+|           └─────────────────────────────────────────┘         |
+|                                                               |
+|             💡 কিবোর্ডে [/] চাপলে ওপরের সার্চ বারে যাবে        |
+|                                                               |
++---------------------------------------------------------------+
+```
 
 ---
 
@@ -76,8 +99,8 @@ In the top-right corner of the Extensions page, switch the **Developer mode** to
 
 ### 6️⃣ Step 6: Open YouTube & Enjoy
 1. Visit **[https://www.youtube.com](https://www.youtube.com)**.
-2. The homepage feed, thumbnails, and Shorts buttons will disappear automatically!
-3. Type anything into the search bar to search and watch videos intentionally.
+2. You will be greeted with the clean Google-style search bar and daily motivational quote!
+3. Press **`/`** on your keyboard to instantly start searching.
 
 ---
 
@@ -87,7 +110,12 @@ In the top-right corner of the Extensions page, switch the **Developer mode** to
 Click the extension icon in your Chrome toolbar to open the control panel:
 - **Hide Home Feed:** Toggle to show/hide the homepage video recommendations and category filter chips.
 - **Hide Shorts & Reels:** Toggle to show/hide Shorts buttons, reels shelves, and channel Shorts tabs.
-- **Instant Response:** Changes apply **instantly in real time** — no page refresh required!
+- **Motivational Quotes:** Toggle to show or hide the daily inspirational quote card.
+- **Instant Response:** All changes apply **instantly in real time** without refreshing the page!
+
+### ⌨️ Keyboard Shortcuts
+- Press **`/`** anywhere on YouTube to instantly focus and type in the search bar.
+- Press **`Escape`** to dismiss and blur the search bar.
 
 ### 🔄 Smart Shorts-to-Video Redirection
 If someone sends you a YouTube Shorts link (e.g. `https://www.youtube.com/shorts/<video_id>`), the extension automatically converts and opens it in YouTube's clean, standard video player (`https://www.youtube.com/watch?v=<video_id>`), protecting you from getting stuck in the infinite vertical scroll loop!
@@ -110,12 +138,29 @@ Then:
 
 ---
 
+## 🗂️ Project Structure
+
+```text
+youtube-minimalist/
+├── manifest.json   # Chrome Extension configuration & permissions (Manifest V3)
+├── styles.css      # Scoped CSS injection for zero-flicker element hiding & Google-style UI
+├── content.js      # Centered search bar, quote generator, hotkeys & SPA router
+├── popup.html      # Minimalist toggle control UI
+├── popup.css       # Clean modern popup design
+├── popup.js        # Chrome storage sync logic
+├── icon.png        # Minimalist extension icon (128x128 PNG)
+├── LICENSE         # Open-source MIT License
+└── README.md       # Complete documentation and setup guide
+```
+
+---
 
 ## ⚙️ Technical Highlights
 
 - **Zero Flicker:** CSS is injected at `document_start` and scoped to `html[data-hide-feed="true"]` and `html[data-hide-shorts="true"]`.
 - **SPA Resilient:** Automatically handles YouTube's Polymer Single Page Application transitions using `yt-navigate-finish` and `popstate`.
-- **Natural Search Focus:** Search box only focuses when clicked by you, preventing annoying auto-focus traps.
+- **Natural Search Focus:** Search box does not steal focus automatically; focuses smoothly upon clicking or pressing the `/` hotkey.
+- **Dark & Light Mode Adaptive:** Full support for YouTube's native light and dark palettes using CSS custom properties.
 - **Privacy-First:** Operates 100% locally on your machine. No telemetry, no third-party APIs, and zero user tracking.
 
 ---

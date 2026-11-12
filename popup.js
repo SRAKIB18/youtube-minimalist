@@ -1,23 +1,26 @@
 const toggleFeed = document.getElementById("toggleFeed");
 const toggleShorts = document.getElementById("toggleShorts");
-const badge = document.querySelector(".badge");
+const toggleQuotes = document.getElementById("toggleQuotes");
+const statusPill = document.getElementById("statusBadge");
 
 function updateBadge() {
-  if (badge) {
+  if (statusPill) {
+    const textEl = statusPill.querySelector(".status-text");
     if (toggleFeed.checked || toggleShorts.checked) {
-      badge.textContent = "ACTIVE";
-      badge.style.background = "#10b981";
+      if (textEl) textEl.textContent = "ACTIVE";
+      statusPill.classList.remove("inactive");
     } else {
-      badge.textContent = "OFF";
-      badge.style.background = "#9ca3af";
+      if (textEl) textEl.textContent = "PAUSED";
+      statusPill.classList.add("inactive");
     }
   }
 }
 
 // সংরক্ষিত সেটিংস লোড করা
-chrome.storage.sync.get(["hideFeed", "hideShorts"], (data) => {
+chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes"], (data) => {
   toggleFeed.checked = data.hideFeed !== false;
   toggleShorts.checked = data.hideShorts !== false;
+  if (toggleQuotes) toggleQuotes.checked = data.showQuotes !== false;
   updateBadge();
 });
 
@@ -33,3 +36,9 @@ toggleShorts.addEventListener("change", () => {
     updateBadge();
   });
 });
+
+if (toggleQuotes) {
+  toggleQuotes.addEventListener("change", () => {
+    chrome.storage.sync.set({ showQuotes: toggleQuotes.checked });
+  });
+}
