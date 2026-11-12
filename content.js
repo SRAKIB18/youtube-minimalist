@@ -7,7 +7,8 @@ let settings = {
     disableAutoplay: true,
     showQuotes: true,
     autoInterval: 10,
-    breakInterval: 30
+    breakInterval: 30,
+    dailyLimit: 120
 };
 
 // সহীহ হাদিস ও অনুপ্রেরণামূলক বাণী (বাংলায়)
@@ -316,7 +317,8 @@ chrome.storage.sync.get([
     "disableAutoplay",
     "showQuotes",
     "autoInterval",
-    "breakInterval"
+    "breakInterval",
+    "dailyLimit"
 ], (data) => {
     if (data.hideFeed !== undefined) settings.hideFeed = data.hideFeed;
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
@@ -326,8 +328,10 @@ chrome.storage.sync.get([
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
     if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
     if (data.breakInterval !== undefined) settings.breakInterval = data.breakInterval;
+    if (data.dailyLimit !== undefined) settings.dailyLimit = Number(data.dailyLimit);
     updateAttributes();
     applyFocusMode();
+    checkDailyStrictLimit();
 });
 
 // পপআপ থেকে টগল অন/অফ করলে সাথে সাথে লাইভ পরিবর্তন হওয়া
@@ -353,8 +357,19 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
             settings.breakInterval = changes.breakInterval.newValue;
             resetBreakThreshold();
         }
+        if (changes.dailyLimit !== undefined) {
+            settings.dailyLimit = Number(changes.dailyLimit.newValue);
+            checkDailyStrictLimit();
+        }
         updateAttributes();
         applyFocusMode();
+    } else if (areaName === "local") {
+        if (changes.emergency_pass_until !== undefined) {
+            checkDailyStrictLimit();
+        }
+        if (changes.pomo_state || changes.pomo_mode || changes.pomo_remaining || changes.pomo_target_time) {
+            updateFloatingPomodoroPill();
+        }
     }
 });
 
@@ -574,6 +589,9 @@ setInterval(() => {
         if (timeValEl) {
             timeValEl.textContent = formatMinutes(currentTodaySec);
         }
+
+        // দৈনিক কঠোর সময়সীমা চেক করা (Option 3)
+        checkDailyStrictLimit(currentTodaySec);
     });
 }, 5000);
 
@@ -778,6 +796,308 @@ function setupCommentsToggle() {
     });
 }
 
+// ==========================================================================
+// OPTION 3: STRICT DAILY LIMIT & POMODORO TIMER
+// ==========================================================================
+
+// ১. দৈনিক কঠোর সময়সীমা এনফোর্সমেন্ট
+function checkDailyStrictLimit(todaySec) {
+    const todayStr = new Date().toISOString().slice(0, 10);
+    const limitMin = Number(settings.dailyLimit) || 0;
+
+    const removeOverlays = () => {
+        const lock = document.getElementById("yt-strict-lock-overlay");
+        if (lock) lock.remove();
+        const banner = document.getElementById("yt-emergency-pass-banner");
+        if (banner) banner.remove();
+    };
+
+    if (limitMin <= 0) {
+        removeOverlays();
+        return;
+    }
+
+    const limitSec = limitMin * 60;
+
+    const evaluateLimit = (sec) => {
+        if (sec < limitSec) {
+            removeOverlays();
+            return;
+        }
+
+        // সীমা শেষ হয়েছে! জরুরি ৫ মিনিটের পাস সক্রিয় কিনা পরীক্ষা
+        chrome.storage.local.get(["emergency_pass_until"], (localData) => {
+            const passUntil = localData.emergency_pass_until || 0;
+            const now = Date.now();
+
+            if (passUntil > now) {
+                // জরুরি পাস চালু রয়েছে
+                const lock = document.getElementById("yt-strict-lock-overlay");
+                if (lock) lock.remove();
+
+                const remPassSec = Math.max(0, Math.round((passUntil - now) / 1000));
+                const remPassMin = Math.ceil(remPassSec / 60);
+
+                let banner = document.getElementById("yt-emergency-pass-banner");
+                if (!banner) {
+                    banner = document.createElement("div");
+                    banner.id = "yt-emergency-pass-banner";
+                    banner.className = "yt-emergency-pass-banner";
+                    document.body.prepend(banner);
+                }
+                banner.innerHTML = `<span>⚠️ জরুরি ৫ মিনিট পাস সক্রিয়: আর <b>${remPassMin} মিনিট</b> বাকি আছে</span>`;
+            } else {
+                // কোনো পাস নেই! স্ট্রিক্ট লক স্ক্রিন কার্যকর করা
+                const banner = document.getElementById("yt-emergency-pass-banner");
+                if (banner) banner.remove();
+
+                // চলমান ভিডিও থাকলে পজ করা
+                const video = document.querySelector("video");
+                if (video && !video.paused) {
+                    video.pause();
+                }
+
+                if (!document.getElementById("yt-strict-lock-overlay")) {
+                    const hadith = getDailyHadith();
+                    const overlay = document.createElement("div");
+                    overlay.id = "yt-strict-lock-overlay";
+                    overlay.className = "yt-strict-lock-overlay";
+
+                    overlay.innerHTML = `
+                        <div class="yt-strict-lock-card">
+                            <div class="yt-lock-icon-halo">🛑</div>
+                            <h2 class="yt-strict-lock-title">আজকের দৈনিক সীমা পূর্ণ হয়েছে</h2>
+                            <p class="yt-strict-lock-subtext">
+                                আপনি আজকের জন্য নির্ধারিত <b>${limitMin >= 60 ? (limitMin / 60) + ' ঘণ্টা' : limitMin + ' মিনিট'}</b> ইউটিউব ব্যবহারের সীমা অতিক্রম করেছেন। সময়কে এখন আরও প্রয়োজনীয় ও গঠনমূলক কাজে ব্যয় করুন।
+                            </p>
+                            
+                            <div class="yt-strict-time-pill">
+                                <span>⏱️ আজকের মোট সময়: ${formatMinutes(sec)}</span>
+                            </div>
+
+                            <div class="yt-strict-quote-box">
+                                <p class="yt-strict-quote-text">"${hadith.text}"</p>
+                                <span class="yt-strict-quote-author">— ${hadith.source}</span>
+                            </div>
+
+                            <div class="yt-strict-actions">
+                                <button type="button" class="yt-strict-btn yt-strict-btn-emergency" id="yt-btn-emergency-pass">
+                                    ⏱️ জরুরি ৫ মিনিট পাস
+                                </button>
+                                <button type="button" class="yt-strict-btn yt-strict-btn-close" id="yt-btn-close-tab">
+                                    ❌ হোমপেজে যান
+                                </button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(overlay);
+
+                    overlay.querySelector("#yt-btn-emergency-pass").addEventListener("click", () => {
+                        const newPassUntil = Date.now() + (5 * 60 * 1000);
+                        chrome.storage.local.set({ emergency_pass_until: newPassUntil }, () => {
+                            checkDailyStrictLimit();
+                        });
+                    });
+
+                    overlay.querySelector("#yt-btn-close-tab").addEventListener("click", () => {
+                        window.location.href = "https://www.google.com";
+                    });
+                }
+            }
+        });
+    };
+
+    if (todaySec !== undefined) {
+        evaluateLimit(todaySec);
+    } else {
+        chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
+            const sec = res.yt_today_date === todayStr ? (res.yt_today_seconds || 0) : 0;
+            evaluateLimit(sec);
+        });
+    }
+}
+
+// ২. পোমোডোরো ফোকাস টাইমার অ্যালার্ট ও সাউন্ড
+function playPomodoroAlarmSound() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+
+        const osc1 = audioCtx.createOscillator();
+        const gain1 = audioCtx.createGain();
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(587.33, now); // D5
+        osc1.frequency.exponentialRampToValueAtTime(880, now + 0.3); // A5
+        gain1.gain.setValueAtTime(0.08, now);
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+        osc1.connect(gain1);
+        gain1.connect(audioCtx.destination);
+        osc1.start(now);
+        osc1.stop(now + 0.7);
+
+        const osc2 = audioCtx.createOscillator();
+        const gain2 = audioCtx.createGain();
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(880, now + 0.25);
+        osc2.frequency.exponentialRampToValueAtTime(1174.66, now + 0.55); // D6
+        gain2.gain.setValueAtTime(0.08, now + 0.25);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.0);
+        osc2.connect(gain2);
+        gain2.connect(audioCtx.destination);
+        osc2.start(now + 0.25);
+        osc2.stop(now + 1.0);
+    } catch (e) {}
+}
+
+function showPomodoroCompletedModal(mode) {
+    if (document.getElementById("yt-pomodoro-modal")) return;
+
+    const modal = document.createElement("div");
+    modal.id = "yt-pomodoro-modal";
+    modal.className = "yt-break-modal-overlay";
+
+    const isWorkDone = mode === "work";
+    modal.innerHTML = `
+        <div class="yt-break-card" style="border-left-color: ${isWorkDone ? '#ef4444' : '#10b981'};">
+            <div class="yt-break-header">
+                <span style="font-size: 20px;">${isWorkDone ? '🍅' : '☕'}</span>
+                <h4 class="yt-break-title">${isWorkDone ? 'পোমোডোরো সেশন সম্পন্ন!' : 'বিরতি শেষ!'}</h4>
+            </div>
+            <p class="yt-break-desc">
+                ${isWorkDone 
+                    ? 'আপনি একটানা <b>২৫ মিনিট</b> সম্পূর্ণ মনোযোগ দিয়ে কাটিয়েছেন। অসাধারণ! এখন ৫ মিনিটের বিশ্রাম নিন।' 
+                    : 'আপনার ৫ মিনিটের রিফ্রেশিং বিরতি শেষ হয়েছে। নতুন ফোকাস সেশনের জন্য প্রস্তুত হন!'}
+            </p>
+            <div class="yt-break-actions">
+                <button type="button" class="yt-break-btn yt-break-btn-secondary" id="yt-pomo-modal-dismiss">ঠিক আছে</button>
+                <button type="button" class="yt-break-btn yt-break-btn-primary" id="yt-pomo-modal-action" style="background: ${isWorkDone ? '#10b981' : '#ef4444'};">
+                    ${isWorkDone ? '☕ বিরতি শুরু করুন' : '🍅 ফোকাস শুরু করুন'}
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    modal.querySelector("#yt-pomo-modal-dismiss").addEventListener("click", () => {
+        modal.remove();
+    });
+
+    modal.querySelector("#yt-pomo-modal-action").addEventListener("click", () => {
+        modal.remove();
+        if (isWorkDone) {
+            const target = Date.now() + (300 * 1000);
+            chrome.storage.local.set({
+                pomo_mode: "break",
+                pomo_state: "running",
+                pomo_remaining: 300,
+                pomo_target_time: target
+            });
+        } else {
+            const target = Date.now() + (1500 * 1000);
+            chrome.storage.local.set({
+                pomo_mode: "work",
+                pomo_state: "running",
+                pomo_remaining: 1500,
+                pomo_target_time: target
+            });
+        }
+    });
+}
+
+function updateFloatingPomodoroPill() {
+    chrome.storage.local.get(["pomo_state", "pomo_mode", "pomo_remaining", "pomo_target_time"], (data) => {
+        const state = data.pomo_state || "idle";
+        const mode = data.pomo_mode || "work";
+
+        if (state === "idle") {
+            const pill = document.getElementById("yt-pomodoro-floating-pill");
+            if (pill) pill.remove();
+            return;
+        }
+
+        let secondsLeft = data.pomo_remaining !== undefined ? data.pomo_remaining : (mode === "break" ? 300 : 1500);
+
+        if (state === "running" && data.pomo_target_time) {
+            secondsLeft = Math.max(0, Math.round((data.pomo_target_time - Date.now()) / 1000));
+            if (secondsLeft <= 0) {
+                playPomodoroAlarmSound();
+                showPomodoroCompletedModal(mode);
+
+                const nextMode = mode === "work" ? "break" : "work";
+                const nextRem = nextMode === "break" ? 300 : 1500;
+                chrome.storage.local.set({
+                    pomo_state: "idle",
+                    pomo_mode: nextMode,
+                    pomo_remaining: nextRem,
+                    pomo_target_time: null
+                });
+                return;
+            }
+        }
+
+        let pill = document.getElementById("yt-pomodoro-floating-pill");
+        if (!pill) {
+            pill = document.createElement("div");
+            pill.id = "yt-pomodoro-floating-pill";
+            pill.className = "yt-pomo-floating-pill";
+            document.body.appendChild(pill);
+        }
+
+        if (mode === "break") {
+            pill.classList.add("is-break");
+        } else {
+            pill.classList.remove("is-break");
+        }
+
+        if (state === "paused") {
+            pill.classList.add("is-paused");
+        } else {
+            pill.classList.remove("is-paused");
+        }
+
+        const m = Math.floor(secondsLeft / 60);
+        const s = secondsLeft % 60;
+        const timeStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+
+        pill.innerHTML = `
+            <span class="pomo-float-dot"></span>
+            <span>${mode === "break" ? '☕' : '🍅'}</span>
+            <span class="pomo-float-time">${timeStr}</span>
+            <button type="button" class="yt-pomo-float-btn" id="yt-pomo-float-toggle" title="${state === 'running' ? 'পজ করুন' : 'চালু করুন'}">
+                ${state === 'running' ? '❚❚' : '▶'}
+            </button>
+        `;
+
+        const toggleBtn = pill.querySelector("#yt-pomo-float-toggle");
+        if (toggleBtn) {
+            toggleBtn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                if (state === "running") {
+                    chrome.storage.local.set({
+                        pomo_state: "paused",
+                        pomo_remaining: secondsLeft,
+                        pomo_target_time: null
+                    });
+                } else {
+                    const target = Date.now() + (secondsLeft * 1000);
+                    chrome.storage.local.set({
+                        pomo_state: "running",
+                        pomo_remaining: secondsLeft,
+                        pomo_target_time: target,
+                        pomo_mode: mode
+                    });
+                }
+            });
+        }
+    });
+}
+
+// পোমোডোরো টাইমার শুরু করা
+setInterval(updateFloatingPomodoroPill, 1000);
+updateFloatingPomodoroPill();
+
 // YouTube SPA নেভিগেশন হ্যান্ডলিং
 window.addEventListener("yt-navigate-finish", () => {
     document.documentElement.setAttribute("data-comments-revealed", "false");
@@ -788,8 +1108,12 @@ window.addEventListener("yt-navigate-finish", () => {
         else existingPill.remove();
     }
     applyFocusMode();
+    checkDailyStrictLimit();
 });
-window.addEventListener("popstate", applyFocusMode);
+window.addEventListener("popstate", () => {
+    applyFocusMode();
+    checkDailyStrictLimit();
+});
 
 // DOM পর্যবেক্ষণ করা
 const observer = new MutationObserver(() => {
