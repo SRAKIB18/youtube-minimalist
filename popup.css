@@ -1,5 +1,5 @@
 body {
-  width: 305px;
+  width: 350px;
   max-height: 560px;
   overflow-y: auto;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
@@ -428,12 +428,12 @@ body::-webkit-scrollbar-thumb:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-input:checked + .slider {
+input:checked+.slider {
   background-color: #ff0000;
   box-shadow: 0 2px 8px rgba(255, 0, 0, 0.3);
 }
 
-input:checked + .slider::before {
+input:checked+.slider::before {
   transform: translateX(16px);
 }
 

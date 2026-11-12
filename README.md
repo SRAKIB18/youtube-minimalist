@@ -96,6 +96,8 @@ Click the extension icon in your Chrome toolbar to open the control panel:
 - **Hide Shorts & Reels:** Toggle to show/hide Shorts buttons, reels shelves, and channel Shorts tabs.
 - **Hide Related Videos:** Toggle sidebar suggested videos and end-screen video overlay cards on watch pages.
 - **Hide Comments:** Toggle the comments section under videos (also toggleable inline on the video page).
+- **Hide Next Video Button:** Toggle player Next button (`.ytp-next-button`) and block the `Shift+N` shortcut.
+- **Hide Replay Button:** Toggle hiding the replay button (`.ytp-play-button` on video end) to avoid reflexively restarting videos.
 - **Daily Hadith:** Toggle to show or hide the daily inspiring Hadith card on the homepage.
 - **Auto-Rotate Interval:** Choose Hadith rotation frequency (5s, 10s, 15s, 30s, 1m, or Off).
 - **Pomodoro Timer:** Fully customizable focus intervals (15m–60m) and break intervals (3m–15m) with start, pause, reset, and mode-switch controls.

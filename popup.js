@@ -2,6 +2,8 @@ const toggleFeed = document.getElementById("toggleFeed");
 const toggleShorts = document.getElementById("toggleShorts");
 const toggleRelated = document.getElementById("toggleRelated");
 const toggleComments = document.getElementById("toggleComments");
+const toggleNextBtn = document.getElementById("toggleNextBtn");
+const toggleReplayBtn = document.getElementById("toggleReplayBtn");
 const toggleQuotes = document.getElementById("toggleQuotes");
 const selectInterval = document.getElementById("selectInterval");
 const selectBreakInterval = document.getElementById("selectBreakInterval");
@@ -146,6 +148,8 @@ chrome.storage.sync.get([
   "hideShorts",
   "hideRelated",
   "hideComments",
+  "hideNextBtn",
+  "hideReplayBtn",
   "showQuotes",
   "autoInterval",
   "breakInterval",
@@ -157,6 +161,8 @@ chrome.storage.sync.get([
   if (toggleShorts) toggleShorts.checked = data.hideShorts !== false;
   if (toggleRelated) toggleRelated.checked = data.hideRelated !== false;
   if (toggleComments) toggleComments.checked = data.hideComments !== false;
+  if (toggleNextBtn) toggleNextBtn.checked = data.hideNextBtn !== false;
+  if (toggleReplayBtn) toggleReplayBtn.checked = data.hideReplayBtn === true;
   if (toggleQuotes) toggleQuotes.checked = data.showQuotes !== false;
   if (selectInterval) {
     selectInterval.value = data.autoInterval !== undefined ? String(data.autoInterval) : "10";
@@ -218,6 +224,18 @@ if (toggleRelated) {
 if (toggleComments) {
   toggleComments.addEventListener("change", () => {
     chrome.storage.sync.set({ hideComments: toggleComments.checked }, updateBadge);
+  });
+}
+
+if (toggleNextBtn) {
+  toggleNextBtn.addEventListener("change", () => {
+    chrome.storage.sync.set({ hideNextBtn: toggleNextBtn.checked });
+  });
+}
+
+if (toggleReplayBtn) {
+  toggleReplayBtn.addEventListener("change", () => {
+    chrome.storage.sync.set({ hideReplayBtn: toggleReplayBtn.checked });
   });
 }
 

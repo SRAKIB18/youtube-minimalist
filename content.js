@@ -4,6 +4,8 @@ let settings = {
     hideShorts: true,
     hideRelated: true,
     hideComments: true,
+    hideNextBtn: true,
+    hideReplayBtn: false,
     showQuotes: true,
     autoInterval: 10,
     breakInterval: 30,
@@ -311,6 +313,8 @@ function updateAttributes() {
     document.documentElement.setAttribute("data-hide-shorts", settings.hideShorts ? "true" : "false");
     document.documentElement.setAttribute("data-hide-related", settings.hideRelated ? "true" : "false");
     document.documentElement.setAttribute("data-hide-comments", settings.hideComments ? "true" : "false");
+    document.documentElement.setAttribute("data-hide-next", settings.hideNextBtn ? "true" : "false");
+    document.documentElement.setAttribute("data-hide-replay", settings.hideReplayBtn ? "true" : "false");
     document.documentElement.setAttribute("data-show-quotes", settings.showQuotes ? "true" : "false");
 }
 
@@ -323,6 +327,8 @@ chrome.storage.sync.get([
     "hideShorts",
     "hideRelated",
     "hideComments",
+    "hideNextBtn",
+    "hideReplayBtn",
     "showQuotes",
     "autoInterval",
     "breakInterval",
@@ -334,6 +340,8 @@ chrome.storage.sync.get([
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
     if (data.hideRelated !== undefined) settings.hideRelated = data.hideRelated;
     if (data.hideComments !== undefined) settings.hideComments = data.hideComments;
+    if (data.hideNextBtn !== undefined) settings.hideNextBtn = data.hideNextBtn;
+    if (data.hideReplayBtn !== undefined) settings.hideReplayBtn = data.hideReplayBtn;
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
     if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
     if (data.breakInterval !== undefined) settings.breakInterval = data.breakInterval;
@@ -341,6 +349,7 @@ chrome.storage.sync.get([
     if (data.pomo_work_duration !== undefined) settings.pomoWorkDuration = Number(data.pomo_work_duration);
     if (data.pomo_break_duration !== undefined) settings.pomoBreakDuration = Number(data.pomo_break_duration);
     updateAttributes();
+    updateVideoEndedAttribute();
     applyFocusMode();
     checkDailyStrictLimit();
 });
@@ -354,6 +363,11 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         if (changes.hideComments !== undefined) {
             settings.hideComments = changes.hideComments.newValue;
             setupCommentsToggle();
+        }
+        if (changes.hideNextBtn !== undefined) settings.hideNextBtn = changes.hideNextBtn.newValue;
+        if (changes.hideReplayBtn !== undefined) {
+            settings.hideReplayBtn = changes.hideReplayBtn.newValue;
+            updateVideoEndedAttribute();
         }
         if (changes.showQuotes !== undefined) settings.showQuotes = changes.showQuotes.newValue;
         if (changes.autoInterval !== undefined) {
@@ -409,6 +423,7 @@ function applyFocusMode() {
     // ওয়াচ পেজ ক্লিন মোড হ্যান্ডলিং (Option 1)
     if (isWatchPage) {
         setupCommentsToggle();
+        attachVideoReplayHandler();
     }
 }
 
@@ -728,7 +743,7 @@ window.addEventListener("keydown", (e) => {
     }
 
     // Next ভিডিও শর্টকাট (Shift+N) ব্লক করা
-    if (e.shiftKey && (e.key === "N" || e.key === "n") && settings.hideRelated && !isInputFocused) {
+    if (e.shiftKey && (e.key === "N" || e.key === "n") && settings.hideNextBtn && !isInputFocused) {
         e.preventDefault();
         e.stopPropagation();
     }
@@ -785,6 +800,86 @@ function setupCommentsToggle() {
             commentsSection.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     });
+}
+
+function isCurrentVideoEnded() {
+    const player = document.querySelector(".html5-video-player, #movie_player");
+    if (player && (player.classList.contains("ended-mode") || (typeof player.getPlayerState === "function" && player.getPlayerState() === 0))) {
+        return true;
+    }
+    const video = document.querySelector("video.html5-main-video, video");
+    if (video && (video.ended || (video.duration > 0 && Math.abs(video.currentTime - video.duration) < 0.8))) {
+        return true;
+    }
+    return false;
+}
+
+function updateVideoEndedAttribute() {
+    if (settings.hideReplayBtn && isCurrentVideoEnded()) {
+        document.documentElement.setAttribute("data-video-ended", "true");
+    } else {
+        document.documentElement.removeAttribute("data-video-ended");
+    }
+}
+
+function attachVideoReplayHandler() {
+    // ১. প্লেয়ার কন্টেইনার ক্লাস পর্যবেক্ষণ (.ended-mode ডিটেকশন)
+    const player = document.querySelector(".html5-video-player, #movie_player");
+    if (player && !player.dataset.hasPlayerStateObserver) {
+        player.dataset.hasPlayerStateObserver = "true";
+        const playerObserver = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                if (m.type === "attributes" && m.attributeName === "class") {
+                    updateVideoEndedAttribute();
+                }
+            }
+        });
+        playerObserver.observe(player, { attributes: true, attributeFilter: ["class"] });
+    }
+
+    // ২. ভিডিও এলিমেন্টের ইভেন্ট হ্যান্ডলার
+    const video = document.querySelector("video.html5-main-video, video");
+    if (video && !video.dataset.hasReplayHandler) {
+        video.dataset.hasReplayHandler = "true";
+
+        const onVideoEnded = () => {
+            if (settings.hideReplayBtn) {
+                document.documentElement.setAttribute("data-video-ended", "true");
+            }
+        };
+
+        const onVideoPlaying = () => {
+            document.documentElement.removeAttribute("data-video-ended");
+        };
+
+        video.addEventListener("ended", onVideoEnded);
+        video.addEventListener("play", onVideoPlaying);
+        video.addEventListener("playing", onVideoPlaying);
+
+        video.addEventListener("timeupdate", () => {
+            if (video.duration > 0 && (video.duration - video.currentTime) < 0.4) {
+                onVideoEnded();
+            } else if (video.duration > 0 && (video.duration - video.currentTime) > 1.5) {
+                if (document.documentElement.getAttribute("data-video-ended") === "true") {
+                    document.documentElement.removeAttribute("data-video-ended");
+                }
+            }
+        });
+
+        video.addEventListener("pause", () => {
+            if (video.duration > 0 && (video.duration - video.currentTime) < 0.8) {
+                onVideoEnded();
+            }
+        });
+
+        video.addEventListener("seeked", () => {
+            if (video.duration > 0 && (video.duration - video.currentTime) > 1.5) {
+                document.documentElement.removeAttribute("data-video-ended");
+            }
+        });
+    }
+
+    updateVideoEndedAttribute();
 }
 
 // ==========================================================================
@@ -1117,6 +1212,7 @@ if (isExtensionValid()) updateFloatingPomodoroPill();
 
 // YouTube SPA নেভিগেশন হ্যান্ডলিং
 window.addEventListener("yt-navigate-finish", () => {
+    document.documentElement.removeAttribute("data-video-ended");
     document.documentElement.setAttribute("data-comments-revealed", "false");
     const existingPill = document.getElementById("yt-toggle-comments-pill");
     if (existingPill) {
@@ -1128,6 +1224,7 @@ window.addEventListener("yt-navigate-finish", () => {
     checkDailyStrictLimit();
 });
 window.addEventListener("popstate", () => {
+    document.documentElement.removeAttribute("data-video-ended");
     applyFocusMode();
     checkDailyStrictLimit();
 });
@@ -1145,6 +1242,7 @@ const observer = new MutationObserver(() => {
         if (settings.hideComments && !document.getElementById("yt-toggle-comments-pill")) {
             setupCommentsToggle();
         }
+        attachVideoReplayHandler();
     }
 });
 
