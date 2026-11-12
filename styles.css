@@ -411,12 +411,6 @@ html[data-hide-comments="true"]:not([data-comments-revealed="true"]) #comments {
     display: none !important;
 }
 
-/* 5.4 Autoplay Cancel & Countdown Overlay */
-html[data-disable-autoplay="true"] .ytp-autonav-endscreen-countdown-container,
-html[data-disable-autoplay="true"] .ytp-autonav-endscreen-button-container {
-    display: none !important;
-}
-
 /* 5.5 Inline Comments Toggle Button */
 .yt-toggle-comments-wrap {
     display: flex;

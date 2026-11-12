@@ -21,13 +21,12 @@ YouTube's homepage and endless Shorts feed are engineered to keep you hooked and
   - **No Sidebar Clickbait:** Hides right-side recommended/related videos so you stay focused on what you're watching.
   - **No End-Screen Overlays:** Blocks annoying thumbnail cards blocking the final seconds of videos.
   - **Hidden Comments with Quick Toggle:** Comments are hidden by default; click the sleek inline button `"💬 কমেন্ট দেখুন"` anytime if you wish to read them.
-  - **Auto-Disable Autoplay:** Prevents YouTube from automatically playing endless videos when one ends.
 - 🔍 **Top Search Bar Preserved:** Only the top search bar is visible, keeping the interface minimal and distraction-free.
 - 📖 **70+ Sahih Hadith Collection (বাংলায় ৭০+ সহীহ হাদিস):** Displays authentic, motivational Hadith on time management, hard work, patience, and intentional focus.
 - ⏱️ **Auto-Rotating Hadith Timer (স্বয়ংক্রিয় পরিবর্তন):** Automatically rotates Hadiths every 5s, 10s, 15s, 30s, or 1m — customizable via popup with hover-pause protection!
 - ⏳ **Time Manager & Daily Tracker (স্ক্রিন টাইম ট্র্যাকার):** Real-time daily YouTube watch time counter with progress bar and automatic midnight resets.
 - 🛑 **Strict Daily Watch Limit (দৈনিক নির্দিষ্ট সীমা ও লকডাউন):** Set a daily quota (30m, 45m, 1h, 1.5h, 2h, 3h). When reached, YouTube smoothly locks with a mindful screen displaying authentic Hadiths and an optional Emergency 5-Minute Pass.
-- 🍅 **Pomodoro Focus Timer (পোমোডোরো টাইমার):** 25-minute deep focus session followed by a 5-minute break. Features synchronized tab timers, floating on-screen indicator (`🍅 24:50`), and soft acoustic chimes.
+- 🍅 **Pomodoro Focus Timer (কাস্টমাইজযোগ্য পোমোডোরো টাইমার):** Set custom focus sessions (15m, 20m, 25m, 30m, 45m, 50m, 60m) and break intervals (3m, 5m, 10m, 15m). Features synchronized tab timers, floating on-screen indicator (`🍅 24:50`), and soft acoustic chimes.
 - 🔔 **Break Reminder Alert (বিরতি সতর্কবার্তা):** Configurable continuous-watch alerts (15m, 20m, 30m, 45m, 1h) with soft chime notifications to protect your eyes.
 - ⌨️ **Quick Search Hotkey (`/`):** Press `/` on your keyboard anywhere on the page to focus the search bar immediately.
 - ⚡ **Instant Live Toggle:** Need to check your subscriptions or feed? Turn it on or off in real-time from the extension popup with **zero page reloads**.
@@ -96,10 +95,9 @@ Click the extension icon in your Chrome toolbar to open the control panel:
 - **Hide Shorts & Reels:** Toggle to show/hide Shorts buttons, reels shelves, and channel Shorts tabs.
 - **Hide Related Videos:** Toggle sidebar suggested videos and end-screen video overlay cards on watch pages.
 - **Hide Comments:** Toggle the comments section under videos (also toggleable inline on the video page).
-- **Disable Autoplay:** Prevents YouTube from automatically advancing to the next video when the current video ends.
 - **Daily Hadith:** Toggle to show or hide the daily inspiring Hadith card on the homepage.
 - **Auto-Rotate Interval:** Choose Hadith rotation frequency (5s, 10s, 15s, 30s, 1m, or Off).
-- **Pomodoro Timer:** Start, pause, or switch between 25-minute focus sessions and 5-minute restorative breaks.
+- **Pomodoro Timer:** Fully customizable focus intervals (15m–60m) and break intervals (3m–15m) with start, pause, reset, and mode-switch controls.
 - **Daily Watch Limit:** Set your strict daily screen time quota (30m, 45m, 1h, 1.5h, 2h, 3h, or Off).
 - **Break Alert Interval:** Set healthy eye-rest break reminders (15m, 20m, 30m, 45m, 1h, or Off).
 - **Instant Response:** All changes apply **instantly in real time** without refreshing the page!

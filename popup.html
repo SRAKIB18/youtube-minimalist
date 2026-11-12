@@ -53,10 +53,36 @@
       <div class="pomo-card-top">
         <div class="pomo-title-wrap">
           <span class="pomo-icon" id="pomoIcon">🍅</span>
-          <span class="pomo-label" id="pomoModeLabel">Focus Session (২৫ মি:)</span>
+          <span class="pomo-label" id="pomoModeLabel">Focus Session</span>
         </div>
         <span class="pomo-time" id="pomoTimeDisplay">25:00</span>
       </div>
+
+      <!-- Custom Pomodoro Durations -->
+      <div class="pomo-duration-row">
+        <div class="pomo-duration-item">
+          <label for="selectPomoWork">🍅 Focus:</label>
+          <select id="selectPomoWork" class="pomo-mini-select">
+            <option value="15">১৫ মি:</option>
+            <option value="20">২০ মি:</option>
+            <option value="25" selected>২৫ মি:</option>
+            <option value="30">৩০ মি:</option>
+            <option value="45">৪৫ মি:</option>
+            <option value="50">৫০ মি:</option>
+            <option value="60">৬০ মি:</option>
+          </select>
+        </div>
+        <div class="pomo-duration-item">
+          <label for="selectPomoBreak">☕ Break:</label>
+          <select id="selectPomoBreak" class="pomo-mini-select">
+            <option value="3">৩ মি:</option>
+            <option value="5" selected>৫ মি:</option>
+            <option value="10">১০ মি:</option>
+            <option value="15">১৫ মি:</option>
+          </select>
+        </div>
+      </div>
+
       <div class="pomo-btn-group">
         <button type="button" class="pomo-btn pomo-btn-primary" id="pomoToggleBtn">▶ Start</button>
         <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoResetBtn">🔄 Reset</button>
@@ -148,17 +174,6 @@
           <span class="label-desc">Video comments (toggle button on video)</span>
         </div>
         <input type="checkbox" id="toggleComments" checked>
-        <span class="slider"></span>
-      </label>
-    </div>
-
-    <div class="control-card">
-      <label class="switch-container">
-        <div class="label-info">
-          <span class="label-title">Disable Autoplay</span>
-          <span class="label-desc">Prevents auto-playing next video</span>
-        </div>
-        <input type="checkbox" id="toggleAutoplay" checked>
         <span class="slider"></span>
       </label>
     </div>

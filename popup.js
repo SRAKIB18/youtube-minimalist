@@ -2,7 +2,6 @@ const toggleFeed = document.getElementById("toggleFeed");
 const toggleShorts = document.getElementById("toggleShorts");
 const toggleRelated = document.getElementById("toggleRelated");
 const toggleComments = document.getElementById("toggleComments");
-const toggleAutoplay = document.getElementById("toggleAutoplay");
 const toggleQuotes = document.getElementById("toggleQuotes");
 const selectInterval = document.getElementById("selectInterval");
 const selectBreakInterval = document.getElementById("selectBreakInterval");
@@ -22,8 +21,12 @@ const pomoTimeDisplay = document.getElementById("pomoTimeDisplay");
 const pomoToggleBtn = document.getElementById("pomoToggleBtn");
 const pomoResetBtn = document.getElementById("pomoResetBtn");
 const pomoSwitchModeBtn = document.getElementById("pomoSwitchModeBtn");
+const selectPomoWork = document.getElementById("selectPomoWork");
+const selectPomoBreak = document.getElementById("selectPomoBreak");
 
 let cachedDailyLimit = 120; // Default 2 hours
+let cachedPomoWork = 25;    // Default 25 mins
+let cachedPomoBreak = 5;     // Default 5 mins
 
 function formatDuration(seconds) {
   if (!seconds || seconds < 60) return "< 1m";
@@ -106,18 +109,19 @@ function updatePomodoroUI() {
       if (mode === "break") {
         pomoCard.classList.add("pomo-break-mode");
         if (pomoIcon) pomoIcon.textContent = "☕";
-        if (pomoModeLabel) pomoModeLabel.textContent = "Break Time (৫ মি:)";
+        if (pomoModeLabel) pomoModeLabel.textContent = `Break Time (${cachedPomoBreak} মি:)`;
         if (pomoSwitchModeBtn) pomoSwitchModeBtn.textContent = "🍅 Focus";
       } else {
         pomoCard.classList.remove("pomo-break-mode");
         if (pomoIcon) pomoIcon.textContent = "🍅";
-        if (pomoModeLabel) pomoModeLabel.textContent = "Focus Session (২৫ মি:)";
+        if (pomoModeLabel) pomoModeLabel.textContent = `Focus Session (${cachedPomoWork} মি:)`;
         if (pomoSwitchModeBtn) pomoSwitchModeBtn.textContent = "☕ Break";
       }
     }
 
     // Timer countdown calculation
-    let currentSeconds = data.pomo_remaining !== undefined ? data.pomo_remaining : (mode === "break" ? 300 : 1500);
+    const defaultSec = mode === "break" ? (cachedPomoBreak * 60) : (cachedPomoWork * 60);
+    let currentSeconds = data.pomo_remaining !== undefined ? data.pomo_remaining : defaultSec;
 
     if (state === "running" && data.pomo_target_time) {
       currentSeconds = Math.max(0, Math.round((data.pomo_target_time - Date.now()) / 1000));
@@ -142,17 +146,17 @@ chrome.storage.sync.get([
   "hideShorts",
   "hideRelated",
   "hideComments",
-  "disableAutoplay",
   "showQuotes",
   "autoInterval",
   "breakInterval",
-  "dailyLimit"
+  "dailyLimit",
+  "pomo_work_duration",
+  "pomo_break_duration"
 ], (data) => {
   if (toggleFeed) toggleFeed.checked = data.hideFeed !== false;
   if (toggleShorts) toggleShorts.checked = data.hideShorts !== false;
   if (toggleRelated) toggleRelated.checked = data.hideRelated !== false;
   if (toggleComments) toggleComments.checked = data.hideComments !== false;
-  if (toggleAutoplay) toggleAutoplay.checked = data.disableAutoplay !== false;
   if (toggleQuotes) toggleQuotes.checked = data.showQuotes !== false;
   if (selectInterval) {
     selectInterval.value = data.autoInterval !== undefined ? String(data.autoInterval) : "10";
@@ -164,12 +168,20 @@ chrome.storage.sync.get([
     cachedDailyLimit = data.dailyLimit !== undefined ? Number(data.dailyLimit) : 120;
     selectDailyLimit.value = String(cachedDailyLimit);
   }
+  if (selectPomoWork) {
+    cachedPomoWork = data.pomo_work_duration !== undefined ? Number(data.pomo_work_duration) : 25;
+    selectPomoWork.value = String(cachedPomoWork);
+  }
+  if (selectPomoBreak) {
+    cachedPomoBreak = data.pomo_break_duration !== undefined ? Number(data.pomo_break_duration) : 5;
+    selectPomoBreak.value = String(cachedPomoBreak);
+  }
   updateBadge();
   updateTimeDisplay();
+  updatePomodoroUI();
 });
 
 // লাইভ স্ক্রিন টাইম ও পোমোডোরো শুরু করা
-updatePomodoroUI();
 setInterval(updatePomodoroUI, 1000);
 
 // লাইভ স্ক্রিন টাইম আপডেট লিসেনার
@@ -209,12 +221,6 @@ if (toggleComments) {
   });
 }
 
-if (toggleAutoplay) {
-  toggleAutoplay.addEventListener("change", () => {
-    chrome.storage.sync.set({ disableAutoplay: toggleAutoplay.checked });
-  });
-}
-
 if (toggleQuotes) {
   toggleQuotes.addEventListener("change", () => {
     chrome.storage.sync.set({ showQuotes: toggleQuotes.checked });
@@ -245,6 +251,45 @@ if (selectDailyLimit) {
   });
 }
 
+// Custom Pomodoro Durations
+if (selectPomoWork) {
+  selectPomoWork.addEventListener("change", () => {
+    const val = parseInt(selectPomoWork.value, 10);
+    cachedPomoWork = isNaN(val) ? 25 : val;
+    chrome.storage.sync.set({ pomo_work_duration: cachedPomoWork });
+
+    chrome.storage.local.get(["pomo_state", "pomo_mode"], (res) => {
+      if ((res.pomo_state || "idle") !== "running" && (res.pomo_mode || "work") === "work") {
+        chrome.storage.local.set({
+          pomo_remaining: cachedPomoWork * 60,
+          pomo_target_time: null
+        }, updatePomodoroUI);
+      } else {
+        updatePomodoroUI();
+      }
+    });
+  });
+}
+
+if (selectPomoBreak) {
+  selectPomoBreak.addEventListener("change", () => {
+    const val = parseInt(selectPomoBreak.value, 10);
+    cachedPomoBreak = isNaN(val) ? 5 : val;
+    chrome.storage.sync.set({ pomo_break_duration: cachedPomoBreak });
+
+    chrome.storage.local.get(["pomo_state", "pomo_mode"], (res) => {
+      if ((res.pomo_state || "idle") !== "running" && res.pomo_mode === "break") {
+        chrome.storage.local.set({
+          pomo_remaining: cachedPomoBreak * 60,
+          pomo_target_time: null
+        }, updatePomodoroUI);
+      } else {
+        updatePomodoroUI();
+      }
+    });
+  });
+}
+
 // Pomodoro Actions
 if (pomoToggleBtn) {
   pomoToggleBtn.addEventListener("click", () => {
@@ -262,9 +307,10 @@ if (pomoToggleBtn) {
         }, updatePomodoroUI);
       } else {
         // Start or Resume timer
+        const defaultSec = mode === "break" ? (cachedPomoBreak * 60) : (cachedPomoWork * 60);
         const rem = res.pomo_remaining !== undefined && res.pomo_remaining > 0
           ? res.pomo_remaining
-          : (mode === "break" ? 300 : 1500);
+          : defaultSec;
         const target = Date.now() + (rem * 1000);
         chrome.storage.local.set({
           pomo_state: "running",
@@ -281,7 +327,7 @@ if (pomoResetBtn) {
   pomoResetBtn.addEventListener("click", () => {
     chrome.storage.local.get(["pomo_mode"], (res) => {
       const mode = res.pomo_mode || "work";
-      const rem = mode === "break" ? 300 : 1500;
+      const rem = mode === "break" ? (cachedPomoBreak * 60) : (cachedPomoWork * 60);
       chrome.storage.local.set({
         pomo_state: "idle",
         pomo_remaining: rem,
@@ -295,7 +341,7 @@ if (pomoSwitchModeBtn) {
   pomoSwitchModeBtn.addEventListener("click", () => {
     chrome.storage.local.get(["pomo_mode"], (res) => {
       const nextMode = (res.pomo_mode || "work") === "work" ? "break" : "work";
-      const rem = nextMode === "break" ? 300 : 1500;
+      const rem = nextMode === "break" ? (cachedPomoBreak * 60) : (cachedPomoWork * 60);
       chrome.storage.local.set({
         pomo_mode: nextMode,
         pomo_state: "idle",

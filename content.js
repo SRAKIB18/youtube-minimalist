@@ -4,11 +4,12 @@ let settings = {
     hideShorts: true,
     hideRelated: true,
     hideComments: true,
-    disableAutoplay: true,
     showQuotes: true,
     autoInterval: 10,
     breakInterval: 30,
-    dailyLimit: 120
+    dailyLimit: 120,
+    pomoWorkDuration: 25,
+    pomoBreakDuration: 5
 };
 
 // সহীহ হাদিস ও অনুপ্রেরণামূলক বাণী (বাংলায়)
@@ -301,7 +302,6 @@ function updateAttributes() {
     document.documentElement.setAttribute("data-hide-shorts", settings.hideShorts ? "true" : "false");
     document.documentElement.setAttribute("data-hide-related", settings.hideRelated ? "true" : "false");
     document.documentElement.setAttribute("data-hide-comments", settings.hideComments ? "true" : "false");
-    document.documentElement.setAttribute("data-disable-autoplay", settings.disableAutoplay ? "true" : "false");
     document.documentElement.setAttribute("data-show-quotes", settings.showQuotes ? "true" : "false");
 }
 
@@ -314,21 +314,23 @@ chrome.storage.sync.get([
     "hideShorts",
     "hideRelated",
     "hideComments",
-    "disableAutoplay",
     "showQuotes",
     "autoInterval",
     "breakInterval",
-    "dailyLimit"
+    "dailyLimit",
+    "pomo_work_duration",
+    "pomo_break_duration"
 ], (data) => {
     if (data.hideFeed !== undefined) settings.hideFeed = data.hideFeed;
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
     if (data.hideRelated !== undefined) settings.hideRelated = data.hideRelated;
     if (data.hideComments !== undefined) settings.hideComments = data.hideComments;
-    if (data.disableAutoplay !== undefined) settings.disableAutoplay = data.disableAutoplay;
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
     if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
     if (data.breakInterval !== undefined) settings.breakInterval = data.breakInterval;
     if (data.dailyLimit !== undefined) settings.dailyLimit = Number(data.dailyLimit);
+    if (data.pomo_work_duration !== undefined) settings.pomoWorkDuration = Number(data.pomo_work_duration);
+    if (data.pomo_break_duration !== undefined) settings.pomoBreakDuration = Number(data.pomo_break_duration);
     updateAttributes();
     applyFocusMode();
     checkDailyStrictLimit();
@@ -344,10 +346,6 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
             settings.hideComments = changes.hideComments.newValue;
             setupCommentsToggle();
         }
-        if (changes.disableAutoplay !== undefined) {
-            settings.disableAutoplay = changes.disableAutoplay.newValue;
-            if (settings.disableAutoplay) disableAutoplay();
-        }
         if (changes.showQuotes !== undefined) settings.showQuotes = changes.showQuotes.newValue;
         if (changes.autoInterval !== undefined) {
             settings.autoInterval = changes.autoInterval.newValue;
@@ -360,6 +358,12 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         if (changes.dailyLimit !== undefined) {
             settings.dailyLimit = Number(changes.dailyLimit.newValue);
             checkDailyStrictLimit();
+        }
+        if (changes.pomo_work_duration !== undefined) {
+            settings.pomoWorkDuration = Number(changes.pomo_work_duration.newValue);
+        }
+        if (changes.pomo_break_duration !== undefined) {
+            settings.pomoBreakDuration = Number(changes.pomo_break_duration.newValue);
         }
         updateAttributes();
         applyFocusMode();
@@ -395,10 +399,6 @@ function applyFocusMode() {
 
     // ওয়াচ পেজ ক্লিন মোড হ্যান্ডলিং (Option 1)
     if (isWatchPage) {
-        if (settings.disableAutoplay) {
-            disableAutoplay();
-            attachVideoEndHandler();
-        }
         setupCommentsToggle();
     }
 }
@@ -709,43 +709,6 @@ window.addEventListener("keydown", (e) => {
 // ==========================================================================
 // WATCH PAGE CLEAN MODE HELPERS (OPTION 1)
 // ==========================================================================
-function disableAutoplay() {
-    if (!settings.disableAutoplay) return;
-    if (!window.location.pathname.startsWith("/watch")) return;
-
-    const tryDisable = () => {
-        const autonavBtn = document.querySelector(
-            'button[data-tooltip-target-id="ytp-autonav-toggle-button"], .ytp-autonav-toggle-button'
-        );
-        if (autonavBtn) {
-            const isChecked = autonavBtn.getAttribute("aria-checked") === "true" ||
-                              autonavBtn.getAttribute("aria-pressed") === "true";
-            if (isChecked) {
-                autonavBtn.click();
-            }
-        }
-    };
-
-    tryDisable();
-    setTimeout(tryDisable, 600);
-    setTimeout(tryDisable, 1500);
-}
-
-function attachVideoEndHandler() {
-    const video = document.querySelector("video.html5-main-video, video");
-    if (video && !video.dataset.hasEndHandler) {
-        video.dataset.hasEndHandler = "true";
-        video.addEventListener("ended", () => {
-            if (settings.disableAutoplay) {
-                const cancelBtn = document.querySelector(
-                    ".ytp-autonav-endscreen-up-next-cancel-button, .ytp-autonav-cancel-button"
-                );
-                if (cancelBtn) cancelBtn.click();
-            }
-        });
-    }
-}
-
 function setupCommentsToggle() {
     const isWatchPage = window.location.pathname.startsWith("/watch");
     const existingPill = document.getElementById("yt-toggle-comments-pill");
@@ -966,8 +929,8 @@ function showPomodoroCompletedModal(mode) {
             </div>
             <p class="yt-break-desc">
                 ${isWorkDone 
-                    ? 'আপনি একটানা <b>২৫ মিনিট</b> সম্পূর্ণ মনোযোগ দিয়ে কাটিয়েছেন। অসাধারণ! এখন ৫ মিনিটের বিশ্রাম নিন।' 
-                    : 'আপনার ৫ মিনিটের রিফ্রেশিং বিরতি শেষ হয়েছে। নতুন ফোকাস সেশনের জন্য প্রস্তুত হন!'}
+                    ? `আপনি একটানা <b>${settings.pomoWorkDuration || 25} মিনিট</b> সম্পূর্ণ মনোযোগ দিয়ে কাটিয়েছেন। অসাধারণ! এখন ${settings.pomoBreakDuration || 5} মিনিটের বিশ্রাম নিন।` 
+                    : `আপনার ${settings.pomoBreakDuration || 5} মিনিটের রিফ্রেশিং বিরতি শেষ হয়েছে। নতুন ${settings.pomoWorkDuration || 25} মিনিটের ফোকাস সেশনের জন্য প্রস্তুত হন!`}
             </p>
             <div class="yt-break-actions">
                 <button type="button" class="yt-break-btn yt-break-btn-secondary" id="yt-pomo-modal-dismiss">ঠিক আছে</button>
@@ -987,19 +950,21 @@ function showPomodoroCompletedModal(mode) {
     modal.querySelector("#yt-pomo-modal-action").addEventListener("click", () => {
         modal.remove();
         if (isWorkDone) {
-            const target = Date.now() + (300 * 1000);
+            const remSec = (settings.pomoBreakDuration || 5) * 60;
+            const target = Date.now() + (remSec * 1000);
             chrome.storage.local.set({
                 pomo_mode: "break",
                 pomo_state: "running",
-                pomo_remaining: 300,
+                pomo_remaining: remSec,
                 pomo_target_time: target
             });
         } else {
-            const target = Date.now() + (1500 * 1000);
+            const remSec = (settings.pomoWorkDuration || 25) * 60;
+            const target = Date.now() + (remSec * 1000);
             chrome.storage.local.set({
                 pomo_mode: "work",
                 pomo_state: "running",
-                pomo_remaining: 1500,
+                pomo_remaining: remSec,
                 pomo_target_time: target
             });
         }
@@ -1017,7 +982,10 @@ function updateFloatingPomodoroPill() {
             return;
         }
 
-        let secondsLeft = data.pomo_remaining !== undefined ? data.pomo_remaining : (mode === "break" ? 300 : 1500);
+        const defaultSec = mode === "break" 
+            ? ((settings.pomoBreakDuration || 5) * 60) 
+            : ((settings.pomoWorkDuration || 25) * 60);
+        let secondsLeft = data.pomo_remaining !== undefined ? data.pomo_remaining : defaultSec;
 
         if (state === "running" && data.pomo_target_time) {
             secondsLeft = Math.max(0, Math.round((data.pomo_target_time - Date.now()) / 1000));
@@ -1026,7 +994,9 @@ function updateFloatingPomodoroPill() {
                 showPomodoroCompletedModal(mode);
 
                 const nextMode = mode === "work" ? "break" : "work";
-                const nextRem = nextMode === "break" ? 300 : 1500;
+                const nextRem = nextMode === "break" 
+                    ? ((settings.pomoBreakDuration || 5) * 60) 
+                    : ((settings.pomoWorkDuration || 25) * 60);
                 chrome.storage.local.set({
                     pomo_state: "idle",
                     pomo_mode: nextMode,
@@ -1127,9 +1097,6 @@ const observer = new MutationObserver(() => {
     if (isWatchPage) {
         if (settings.hideComments && !document.getElementById("yt-toggle-comments-pill")) {
             setupCommentsToggle();
-        }
-        if (settings.disableAutoplay) {
-            attachVideoEndHandler();
         }
     }
 });
