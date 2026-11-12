@@ -49,6 +49,58 @@ html[data-hide-shorts="true"] ytd-compact-video-renderer:has(a[href*="/shorts/"]
 /* ==========================================================================
    3. ISLAMIC HADITH & PEACEFUL FOCUS WORKSPACE
    ========================================================================== */
+
+/* Focus Theme Custom Variables */
+:root {
+    --ytf-bg-card: var(--yt-spec-base-background, #ffffff);
+    --ytf-border-card: var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.08));
+    --ytf-text-primary: var(--yt-spec-text-primary, #0f0f0f);
+    --ytf-text-secondary: var(--yt-spec-text-secondary, #606060);
+    --ytf-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+    --ytf-chip-bg: var(--yt-spec-badge-chip-background, #f2f2f2);
+    --ytf-chip-border: var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.12));
+    --ytf-floating-bg: rgba(255, 255, 255, 0.96);
+}
+
+/* Dark theme applied when user selects Dark Mode OR when YouTube/Browser is Dark (unless User selected Light Mode) */
+html[data-focus-theme="dark"],
+html:not([data-focus-theme="light"])[dark] {
+    --ytf-bg-card: #1a1a1a;
+    --ytf-border-card: #2e2e2e;
+    --ytf-text-primary: #f1f1f1;
+    --ytf-text-secondary: #aaaaaa;
+    --ytf-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.5);
+    --ytf-chip-bg: #272727;
+    --ytf-chip-border: #3f3f3f;
+    --ytf-floating-bg: rgba(26, 26, 26, 0.96);
+}
+
+@media (prefers-color-scheme: dark) {
+    html:not([data-focus-theme="light"]):not([data-focus-theme="dark"]),
+    html[data-focus-theme="system"] {
+        --ytf-bg-card: #1a1a1a;
+        --ytf-border-card: #2e2e2e;
+        --ytf-text-primary: #f1f1f1;
+        --ytf-text-secondary: #aaaaaa;
+        --ytf-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.5);
+        --ytf-chip-bg: #272727;
+        --ytf-chip-border: #3f3f3f;
+        --ytf-floating-bg: rgba(26, 26, 26, 0.96);
+    }
+}
+
+/* Force light theme when user explicitly chooses Light Mode */
+html[data-focus-theme="light"] {
+    --ytf-bg-card: #ffffff !important;
+    --ytf-border-card: rgba(0, 0, 0, 0.08) !important;
+    --ytf-text-primary: #0f0f0f !important;
+    --ytf-text-secondary: #606060 !important;
+    --ytf-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03) !important;
+    --ytf-chip-bg: #f2f2f2 !important;
+    --ytf-chip-border: rgba(0, 0, 0, 0.12) !important;
+    --ytf-floating-bg: rgba(255, 255, 255, 0.96) !important;
+}
+
 .yt-focus-placeholder {
     display: flex;
     flex-direction: column;
@@ -60,7 +112,7 @@ html[data-hide-shorts="true"] ytd-compact-video-renderer:has(a[href*="/shorts/"]
     margin: 8vh auto 0 auto;
     padding: 24px;
     font-family: -apple-system, BlinkMacSystemFont, "Kalpurush", "Noto Sans Bengali", "Segoe UI", Roboto, sans-serif;
-    color: var(--yt-spec-text-primary, #0f0f0f);
+    color: var(--ytf-text-primary);
     animation: focusFadeUp 0.45s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
 }
@@ -106,13 +158,13 @@ html[data-hide-shorts="true"] ytd-compact-video-renderer:has(a[href*="/shorts/"]
     margin: 0 0 10px 0;
     letter-spacing: -0.5px;
     line-height: 1.3;
-    color: var(--yt-spec-text-primary, #0f0f0f);
+    color: var(--ytf-text-primary);
 }
 
 .yt-focus-subtext {
     font-size: 15px;
     margin: 0;
-    color: var(--yt-spec-text-secondary, #606060);
+    color: var(--ytf-text-secondary);
     line-height: 1.5;
 }
 
@@ -125,18 +177,12 @@ html[data-hide-shorts="true"] ytd-compact-video-renderer:has(a[href*="/shorts/"]
     max-width: 580px;
     padding: 24px 28px;
     border-radius: 20px;
-    background: var(--yt-spec-base-background, #ffffff);
-    border: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.08));
+    background: var(--ytf-bg-card);
+    border: 1px solid var(--ytf-border-card);
     box-sizing: border-box;
     position: relative;
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06), 0 2px 8px rgba(0, 0, 0, 0.03);
+    box-shadow: var(--ytf-shadow);
     transition: all 0.3s ease;
-}
-
-html[dark] .yt-focus-quote-wrap {
-    background: #1a1a1a;
-    border-color: #2e2e2e;
-    box-shadow: 0 12px 35px -10px rgba(0, 0, 0, 0.5);
 }
 
 .yt-focus-quote-wrap:hover {
@@ -159,7 +205,7 @@ html[data-show-quotes="false"] .yt-focus-quote-wrap {
 .yt-focus-quote-text {
     font-size: 17px;
     font-weight: 500;
-    color: var(--yt-spec-text-primary, #1f2937);
+    color: var(--ytf-text-primary);
     line-height: 1.75;
     margin: 0 0 16px 0;
     max-width: 520px;
@@ -173,11 +219,7 @@ html[data-show-quotes="false"] .yt-focus-quote-wrap {
     justify-content: space-between;
     width: 100%;
     padding-top: 14px;
-    border-top: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.06));
-}
-
-html[dark] .yt-focus-quote-footer {
-    border-top-color: #2b2b2b;
+    border-top: 1px solid var(--ytf-border-card);
 }
 
 .yt-focus-quote-author {
@@ -219,7 +261,7 @@ html[dark] .yt-focus-quote-footer {
 .yt-focus-search-hint {
     margin-top: 24px;
     font-size: 13px;
-    color: var(--yt-spec-text-secondary, #777777);
+    color: var(--ytf-text-secondary);
 }
 
 .yt-focus-search-hint kbd {
@@ -228,17 +270,11 @@ html[dark] .yt-focus-quote-footer {
     font-size: 12px;
     font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
     font-weight: 600;
-    background: var(--yt-spec-badge-chip-background, #f2f2f2);
-    color: var(--yt-spec-text-primary, #111111);
-    border: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.12));
+    background: var(--ytf-chip-bg);
+    color: var(--ytf-text-primary);
+    border: 1px solid var(--ytf-chip-border);
     border-radius: 6px;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-}
-
-html[dark] .yt-focus-search-hint kbd {
-    background: #2a2a2a;
-    border-color: #404040;
-    color: #cccccc;
 }
 
 /* Animations */
@@ -280,20 +316,13 @@ html[dark] .yt-focus-search-hint kbd {
     display: flex;
     flex-direction: column;
     width: 320px;
-    background: var(--yt-spec-base-background, #ffffff);
-    border: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.1));
+    background: var(--ytf-bg-card);
+    border: 1px solid var(--ytf-border-card);
     border-left: 4px solid #10b981;
     border-radius: 14px;
     padding: 16px;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-shadow: var(--ytf-shadow);
     box-sizing: border-box;
-}
-
-html[dark] .yt-break-card {
-    background: #1e1e1e;
-    border-color: #333333;
-    border-left-color: #10b981;
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
 }
 
 .yt-break-header {
@@ -306,13 +335,13 @@ html[dark] .yt-break-card {
 .yt-break-title {
     font-size: 15px;
     font-weight: 700;
-    color: var(--yt-spec-text-primary, #111827);
+    color: var(--ytf-text-primary);
     margin: 0;
 }
 
 .yt-break-desc {
     font-size: 13px;
-    color: var(--yt-spec-text-secondary, #6b7280);
+    color: var(--ytf-text-secondary);
     line-height: 1.45;
     margin: 0 0 12px 0;
 }
@@ -434,22 +463,16 @@ html[data-hide-comments="false"] .yt-toggle-comments-wrap {
     align-items: center;
     gap: 8px;
     padding: 9px 22px;
-    background: var(--yt-spec-badge-chip-background, #f2f2f2);
-    border: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.1));
+    background: var(--ytf-chip-bg);
+    border: 1px solid var(--ytf-chip-border);
     border-radius: 9999px;
-    color: var(--yt-spec-text-primary, #0f0f0f);
+    color: var(--ytf-text-primary);
     font-size: 13.5px;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     font-family: inherit;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-html[dark] .yt-toggle-comments-pill {
-    background: #272727;
-    border-color: #3f3f3f;
-    color: #f1f1f1;
 }
 
 .yt-toggle-comments-pill:hover {
@@ -473,10 +496,10 @@ html[dark] .yt-toggle-comments-pill {
     align-items: center;
     gap: 8px;
     padding: 6px 14px;
-    background: var(--yt-spec-base-background, #ffffff);
+    background: var(--ytf-floating-bg);
     border: 1.5px solid #ef4444;
     border-radius: 9999px;
-    color: var(--yt-spec-text-primary, #111827);
+    color: var(--ytf-text-primary);
     box-shadow: 0 4px 16px rgba(239, 68, 68, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 13px;
@@ -484,12 +507,6 @@ html[dark] .yt-toggle-comments-pill {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     animation: pomoSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     user-select: none;
-}
-
-html[dark] .yt-pomo-floating-pill {
-    background: #1c1c1c;
-    border-color: #ef4444;
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.6);
 }
 
 .yt-pomo-floating-pill.is-break {

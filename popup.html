@@ -21,9 +21,38 @@
         <span class="version-tag">v1.5</span>
       </div>
     </div>
-    <div class="status-pill" id="statusBadge">
-      <span class="status-dot"></span>
-      <span class="status-text">ACTIVE</span>
+    <div class="header-right">
+      <div class="theme-seg-control" id="themeSegControl" title="Theme Mode">
+        <button type="button" class="theme-seg-btn" data-theme="light" title="Light Mode">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+        <button type="button" class="theme-seg-btn active" data-theme="system" title="Default Browser Mode">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </button>
+        <button type="button" class="theme-seg-btn" data-theme="dark" title="Dark Mode">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="status-pill" id="statusBadge">
+        <span class="status-dot"></span>
+        <span class="status-text">ACTIVE</span>
+      </div>
     </div>
   </div>
 
@@ -263,6 +292,23 @@
           <option value="15">১৫ সেকেন্ড</option>
           <option value="30">৩০ সেকেন্ড</option>
           <option value="60">১ মিনিট</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Group: Appearance -->
+    <div class="section-title">Appearance</div>
+
+    <div class="control-card">
+      <div class="select-container">
+        <div class="label-info">
+          <span class="label-title">Theme Mode</span>
+          <span class="label-desc">Dark, Light or Default Browser</span>
+        </div>
+        <select id="selectTheme" class="custom-select">
+          <option value="system" selected>Default Browser (স্বয়ংক্রিয়)</option>
+          <option value="light">Light Mode (লাইট মোড)</option>
+          <option value="dark">Dark Mode (ডার্ক মোড)</option>
         </select>
       </div>
     </div>

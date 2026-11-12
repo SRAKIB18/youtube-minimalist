@@ -1,5 +1,6 @@
 // Focus Mode Settings
 let settings = {
+    theme: "system",
     hideFeed: true,
     hideShorts: true,
     hideRelated: true,
@@ -308,6 +309,7 @@ function isExtensionValid() {
 
 // HTML ট্যাগে লাইভ ডাটা-অ্যাট্রিবিউট আপডেট করা যাতে CSS সরাসরি কাজ করে
 function updateAttributes() {
+    document.documentElement.setAttribute("data-focus-theme", settings.theme || "system");
     document.documentElement.setAttribute("data-hide-feed", settings.hideFeed ? "true" : "false");
     document.documentElement.setAttribute("data-hide-shorts", settings.hideShorts ? "true" : "false");
     document.documentElement.setAttribute("data-hide-related", settings.hideRelated ? "true" : "false");
@@ -321,6 +323,7 @@ updateAttributes();
 
 // স্টোরেজ থেকে ইউজারের সেটিংস লোড করা
 chrome.storage.sync.get([
+    "theme",
     "hideFeed",
     "hideShorts",
     "hideRelated",
@@ -333,6 +336,7 @@ chrome.storage.sync.get([
     "pomo_work_duration",
     "pomo_break_duration"
 ], (data) => {
+    if (data.theme !== undefined) settings.theme = data.theme;
     if (data.hideFeed !== undefined) settings.hideFeed = data.hideFeed;
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
     if (data.hideRelated !== undefined) settings.hideRelated = data.hideRelated;
@@ -352,6 +356,9 @@ chrome.storage.sync.get([
 // পপআপ থেকে টগল অন/অফ করলে সাথে সাথে লাইভ পরিবর্তন হওয়া
 chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "sync") {
+        if (changes.theme !== undefined) {
+            settings.theme = changes.theme.newValue;
+        }
         if (changes.hideFeed !== undefined) settings.hideFeed = changes.hideFeed.newValue;
         if (changes.hideShorts !== undefined) settings.hideShorts = changes.hideShorts.newValue;
         if (changes.hideRelated !== undefined) settings.hideRelated = changes.hideRelated.newValue;

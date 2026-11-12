@@ -102,6 +102,7 @@ Click the extension icon in your Chrome toolbar to open the control panel:
 - **Pomodoro Timer:** Fully customizable focus intervals (15m–60m) and break intervals (3m–15m) with start, pause, reset, and mode-switch controls.
 - **Daily Watch Limit:** Set your strict daily screen time quota (30m, 45m, 1h, 1.5h, 2h, 3h, or Off).
 - **Break Alert Interval:** Set healthy eye-rest break reminders (15m, 20m, 30m, 45m, 1h, or Off).
+- **Theme Mode (ডার্ক, লাইট ও ব্রাউজার ডিফল্ট মোড):** Switch seamlessly between **Light Mode**, **Dark Mode**, and **Default Browser Mode (System)** via the header quick-switch icons or the Appearance dropdown.
 - **Instant Response:** All changes apply **instantly in real time** without refreshing the page!
 
 ### ⌨️ Keyboard Shortcuts

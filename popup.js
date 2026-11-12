@@ -7,6 +7,8 @@ const toggleQuotes = document.getElementById("toggleQuotes");
 const selectInterval = document.getElementById("selectInterval");
 const selectBreakInterval = document.getElementById("selectBreakInterval");
 const selectDailyLimit = document.getElementById("selectDailyLimit");
+const selectTheme = document.getElementById("selectTheme");
+const themeSegButtons = document.querySelectorAll(".theme-seg-btn");
 const statusPill = document.getElementById("statusBadge");
 
 const todayTimeDisplay = document.getElementById("todayTimeDisplay");
@@ -42,6 +44,23 @@ function formatTimer(seconds) {
   const m = Math.floor(Math.max(0, seconds) / 60);
   const s = Math.floor(Math.max(0, seconds) % 60);
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function applyTheme(theme) {
+  const effectiveTheme = theme || "system";
+  document.documentElement.setAttribute("data-theme", effectiveTheme);
+
+  if (selectTheme) {
+    selectTheme.value = effectiveTheme;
+  }
+
+  themeSegButtons.forEach((btn) => {
+    if (btn.getAttribute("data-theme") === effectiveTheme) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
 }
 
 const ICONS = {
@@ -159,6 +178,7 @@ function updatePomodoroUI() {
 
 // সংরক্ষিত সেটিংস লোড করা
 chrome.storage.sync.get([
+  "theme",
   "hideFeed",
   "hideShorts",
   "hideRelated",
@@ -171,6 +191,7 @@ chrome.storage.sync.get([
   "pomo_work_duration",
   "pomo_break_duration"
 ], (data) => {
+  applyTheme(data.theme || "system");
   if (toggleFeed) toggleFeed.checked = data.hideFeed !== false;
   if (toggleShorts) toggleShorts.checked = data.hideShorts !== false;
   if (toggleRelated) toggleRelated.checked = data.hideRelated !== false;
@@ -203,8 +224,11 @@ chrome.storage.sync.get([
 // লাইভ স্ক্রিন টাইম ও পোমোডোরো শুরু করা
 setInterval(updatePomodoroUI, 1000);
 
-// লাইভ স্ক্রিন টাইম আপডেট লিসেনার
+// লাইভ স্ক্রিন টাইম ও সেটিংস আপডেট লিসেনার
 chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "sync" && changes.theme) {
+    applyTheme(changes.theme.newValue);
+  }
   if (area === "local") {
     if (changes.yt_today_seconds || changes.yt_session_seconds) {
       updateTimeDisplay();
@@ -376,3 +400,21 @@ if (pomoSwitchModeBtn) {
     });
   });
 }
+
+// Appearance Theme Controls
+if (selectTheme) {
+  selectTheme.addEventListener("change", () => {
+    const val = selectTheme.value;
+    applyTheme(val);
+    chrome.storage.sync.set({ theme: val });
+  });
+}
+
+themeSegButtons.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    const val = btn.getAttribute("data-theme");
+    applyTheme(val);
+    chrome.storage.sync.set({ theme: val });
+  });
+});
+
