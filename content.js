@@ -704,6 +704,12 @@ window.addEventListener("keydown", (e) => {
             activeEl.blur();
         }
     }
+
+    // Next ভিডিও শর্টকাট (Shift+N) ব্লক করা
+    if (e.shiftKey && (e.key === "N" || e.key === "n") && settings.hideRelated && !isInputFocused) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 });
 
 // ==========================================================================

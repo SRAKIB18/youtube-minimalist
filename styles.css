@@ -391,7 +391,7 @@ html[data-hide-related="true"] ytd-item-section-renderer[section-identifier="rel
     display: none !important;
 }
 
-/* 5.2 Hide End-Screen Video Overlays & Suggestion Cards */
+/* 5.2 Hide End-Screen Video Overlays, Next Button & Suggestion Cards */
 html[data-hide-related="true"] .ytp-ce-element,
 html[data-hide-related="true"] .ytp-endscreen-content,
 html[data-hide-related="true"] .ytp-ce-covering-overlay,
@@ -399,7 +399,9 @@ html[data-hide-related="true"] .ytp-ce-element-show,
 html[data-hide-related="true"] .ytp-ce-video,
 html[data-hide-related="true"] .ytp-ce-channel,
 html[data-hide-related="true"] .ytp-ce-expanding-overlay,
-html[data-hide-related="true"] .ytp-autonav-endscreen-button-container {
+html[data-hide-related="true"] .ytp-autonav-endscreen-button-container,
+html[data-hide-related="true"] .ytp-next-button,
+html[data-hide-related="true"] a.ytp-next-button {
     display: none !important;
 }
 

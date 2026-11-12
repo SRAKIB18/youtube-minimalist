@@ -21,6 +21,7 @@ YouTube's homepage and endless Shorts feed are engineered to keep you hooked and
   - **No Sidebar Clickbait:** Hides right-side recommended/related videos so you stay focused on what you're watching.
   - **No End-Screen Overlays:** Blocks annoying thumbnail cards blocking the final seconds of videos.
   - **Hidden Comments with Quick Toggle:** Comments are hidden by default; click the sleek inline button `"💬 কমেন্ট দেখুন"` anytime if you wish to read them.
+  - **No Next Video Temptation:** Hides the Next button (`.ytp-next-button`) in player controls and disables the `Shift+N` shortcut.
 - 🔍 **Top Search Bar Preserved:** Only the top search bar is visible, keeping the interface minimal and distraction-free.
 - 📖 **70+ Sahih Hadith Collection (বাংলায় ৭০+ সহীহ হাদিস):** Displays authentic, motivational Hadith on time management, hard work, patience, and intentional focus.
 - ⏱️ **Auto-Rotating Hadith Timer (স্বয়ংক্রিয় পরিবর্তন):** Automatically rotates Hadiths every 5s, 10s, 15s, 30s, or 1m — customizable via popup with hover-pause protection!
