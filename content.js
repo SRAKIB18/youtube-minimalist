@@ -2,7 +2,8 @@
 let settings = {
     hideFeed: true,
     hideShorts: true,
-    showQuotes: true
+    showQuotes: true,
+    autoInterval: 10
 };
 
 // সহীহ হাদিস ও অনুপ্রেরণামূলক বাণী (বাংলায়)
@@ -300,10 +301,11 @@ function updateAttributes() {
 updateAttributes();
 
 // স্টোরেজ থেকে ইউজারের সেটিংস লোড করা
-chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes"], (data) => {
+chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes", "autoInterval"], (data) => {
     if (data.hideFeed !== undefined) settings.hideFeed = data.hideFeed;
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
+    if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
     updateAttributes();
     applyFocusMode();
 });
@@ -314,6 +316,10 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         if (changes.hideFeed !== undefined) settings.hideFeed = changes.hideFeed.newValue;
         if (changes.hideShorts !== undefined) settings.hideShorts = changes.hideShorts.newValue;
         if (changes.showQuotes !== undefined) settings.showQuotes = changes.showQuotes.newValue;
+        if (changes.autoInterval !== undefined) {
+            settings.autoInterval = changes.autoInterval.newValue;
+            restartAutoRotateTimer();
+        }
         updateAttributes();
         applyFocusMode();
     }
@@ -353,6 +359,57 @@ function getRandomHadith() {
     } while (HADITH_QUOTES.length > 1 && nextIndex === currentHadithIndex);
     currentHadithIndex = nextIndex;
     return HADITH_QUOTES[currentHadithIndex];
+}
+
+let rotateTimer = null;
+let isCardHovered = false;
+
+// মসৃণ এনিমেশনের সাথে পরবর্তী হাদিস প্রদর্শন
+function displayNextHadith(animate = true) {
+    const nextHadith = getRandomHadith();
+    const qText = document.getElementById("yt-quote-text");
+    const qAuthor = document.getElementById("yt-quote-author");
+    if (!qText || !qAuthor) return;
+
+    if (animate) {
+        qText.classList.add("yt-quote-transitioning");
+        qAuthor.classList.add("yt-quote-transitioning");
+        setTimeout(() => {
+            qText.textContent = nextHadith.text;
+            qAuthor.textContent = `— ${nextHadith.source}`;
+            qText.classList.remove("yt-quote-transitioning");
+            qAuthor.classList.remove("yt-quote-transitioning");
+        }, 250);
+    } else {
+        qText.textContent = nextHadith.text;
+        qAuthor.textContent = `— ${nextHadith.source}`;
+    }
+}
+
+// স্বয়ংক্রিয় রোটেশন টাইমার শুরু করা
+function startAutoRotateTimer() {
+    stopAutoRotateTimer();
+    const intervalSec = Number(settings.autoInterval);
+    if (intervalSec && intervalSec > 0) {
+        rotateTimer = setInterval(() => {
+            if (!isCardHovered) {
+                displayNextHadith(true);
+            }
+        }, intervalSec * 1000);
+    }
+}
+
+// টাইমার বন্ধ করা
+function stopAutoRotateTimer() {
+    if (rotateTimer) {
+        clearInterval(rotateTimer);
+        rotateTimer = null;
+    }
+}
+
+function restartAutoRotateTimer() {
+    stopAutoRotateTimer();
+    startAutoRotateTimer();
 }
 
 function injectPlaceholder() {
@@ -398,23 +455,29 @@ function injectPlaceholder() {
         `;
         browse.prepend(card);
 
+        // মাউস কার্ডের ওপর রাখলে রোটেশন পজ করা যাতে পড়ার সুবিধা হয়
+        const quoteWrap = card.querySelector("#yt-focus-quote-wrap");
+        if (quoteWrap) {
+            quoteWrap.addEventListener("mouseenter", () => { isCardHovered = true; });
+            quoteWrap.addEventListener("mouseleave", () => { isCardHovered = false; });
+        }
+
         // হাদিস রিফ্রেশ হ্যান্ডলার
         const refreshBtn = card.querySelector("#yt-focus-quote-refresh");
         if (refreshBtn) {
             refreshBtn.addEventListener("click", () => {
-                const nextHadith = getRandomHadith();
-                const qText = document.getElementById("yt-quote-text");
-                const qAuthor = document.getElementById("yt-quote-author");
-                if (qText && qAuthor) {
-                    qText.textContent = nextHadith.text;
-                    qAuthor.textContent = `— ${nextHadith.source}`;
-                }
+                displayNextHadith(true);
+                restartAutoRotateTimer(); // ইউজার ক্লিক করলে টাইমার রিসেট হবে
             });
         }
+
+        // অটো রোটেশন টাইমার শুরু করা
+        startAutoRotateTimer();
     }
 }
 
 function removePlaceholder() {
+    stopAutoRotateTimer();
     const card = document.getElementById("yt-focus-welcome-card");
     if (card) card.remove();
 }

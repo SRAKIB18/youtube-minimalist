@@ -1,6 +1,7 @@
 const toggleFeed = document.getElementById("toggleFeed");
 const toggleShorts = document.getElementById("toggleShorts");
 const toggleQuotes = document.getElementById("toggleQuotes");
+const selectInterval = document.getElementById("selectInterval");
 const statusPill = document.getElementById("statusBadge");
 
 function updateBadge() {
@@ -17,10 +18,13 @@ function updateBadge() {
 }
 
 // সংরক্ষিত সেটিংস লোড করা
-chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes"], (data) => {
+chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes", "autoInterval"], (data) => {
   toggleFeed.checked = data.hideFeed !== false;
   toggleShorts.checked = data.hideShorts !== false;
   if (toggleQuotes) toggleQuotes.checked = data.showQuotes !== false;
+  if (selectInterval) {
+    selectInterval.value = data.autoInterval !== undefined ? String(data.autoInterval) : "10";
+  }
   updateBadge();
 });
 
@@ -40,5 +44,12 @@ toggleShorts.addEventListener("change", () => {
 if (toggleQuotes) {
   toggleQuotes.addEventListener("change", () => {
     chrome.storage.sync.set({ showQuotes: toggleQuotes.checked });
+  });
+}
+
+if (selectInterval) {
+  selectInterval.addEventListener("change", () => {
+    const val = parseInt(selectInterval.value, 10);
+    chrome.storage.sync.set({ autoInterval: isNaN(val) ? 10 : val });
   });
 }

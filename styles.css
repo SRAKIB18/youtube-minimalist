@@ -164,6 +164,7 @@ html[data-show-quotes="false"] .yt-focus-quote-wrap {
     margin: 0 0 16px 0;
     max-width: 520px;
     letter-spacing: -0.2px;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .yt-focus-quote-footer {
@@ -184,6 +185,12 @@ html[dark] .yt-focus-quote-footer {
     font-weight: 600;
     color: #10b981;
     letter-spacing: -0.1px;
+    transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yt-quote-transitioning {
+    opacity: 0 !important;
+    transform: translateY(-5px) !important;
 }
 
 #yt-focus-quote-refresh {
