@@ -296,6 +296,15 @@ const HADITH_QUOTES = [
     }
 ];
 
+// এক্সটেনশন কনটেক্সট ভ্যালিডিটি হেল্পার (রিলোড বা আপডেটের পর এরর প্রতিরোধ)
+function isExtensionValid() {
+    try {
+        return typeof chrome !== "undefined" && !!chrome.runtime && !!chrome.runtime.id;
+    } catch (e) {
+        return false;
+    }
+}
+
 // HTML ট্যাগে লাইভ ডাটা-অ্যাট্রিবিউট আপডেট করা যাতে CSS সরাসরি কাজ করে
 function updateAttributes() {
     document.documentElement.setAttribute("data-hide-feed", settings.hideFeed ? "true" : "false");
@@ -550,7 +559,12 @@ function formatMinutes(seconds) {
 }
 
 // প্রতি ৫ সেকেন্ডে সক্রিয় স্ক্রিন টাইম ট্র্যাক করা
-setInterval(() => {
+const trackingInterval = setInterval(() => {
+    if (!isExtensionValid()) {
+        clearInterval(trackingInterval);
+        return;
+    }
+
     if (document.visibilityState !== "visible") return;
 
     sessionSeconds += 5;
@@ -570,29 +584,34 @@ setInterval(() => {
 
     // লোকাল স্টোরেজে দৈনিক সময় আপডেট করা
     const todayStr = new Date().toISOString().slice(0, 10);
-    chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
-        let currentTodaySec = 0;
-        if (res.yt_today_date === todayStr) {
-            currentTodaySec = (res.yt_today_seconds || 0) + 5;
-        } else {
-            currentTodaySec = 5; // নতুন দিন শুরু হলে রিসেট
-        }
+    try {
+        chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
+            if (!isExtensionValid()) return;
+            let currentTodaySec = 0;
+            if (res.yt_today_date === todayStr) {
+                currentTodaySec = (res.yt_today_seconds || 0) + 5;
+            } else {
+                currentTodaySec = 5; // নতুন দিন শুরু হলে রিসেট
+            }
 
-        chrome.storage.local.set({
-            yt_today_date: todayStr,
-            yt_today_seconds: currentTodaySec,
-            yt_session_seconds: sessionSeconds
+            chrome.storage.local.set({
+                yt_today_date: todayStr,
+                yt_today_seconds: currentTodaySec,
+                yt_session_seconds: sessionSeconds
+            });
+
+            // হোমপেজে টাইম পিল আপডেট
+            const timeValEl = document.getElementById("yt-home-today-time");
+            if (timeValEl) {
+                timeValEl.textContent = formatMinutes(currentTodaySec);
+            }
+
+            // দৈনিক কঠোর সময়সীমা চেক করা (Option 3)
+            checkDailyStrictLimit(currentTodaySec);
         });
-
-        // হোমপেজে টাইম পিল আপডেট
-        const timeValEl = document.getElementById("yt-home-today-time");
-        if (timeValEl) {
-            timeValEl.textContent = formatMinutes(currentTodaySec);
-        }
-
-        // দৈনিক কঠোর সময়সীমা চেক করা (Option 3)
-        checkDailyStrictLimit(currentTodaySec);
-    });
+    } catch (e) {
+        if (!isExtensionValid()) clearInterval(trackingInterval);
+    }
 }, 5000);
 
 function injectPlaceholder() {
@@ -646,13 +665,16 @@ function injectPlaceholder() {
 
         // হোমপেজে স্ক্রিন টাইম তাৎক্ষণিক প্রদর্শন
         const todayStr = new Date().toISOString().slice(0, 10);
-        chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
-            const timeValEl = card.querySelector("#yt-home-today-time");
-            if (timeValEl) {
-                const todaySec = res.yt_today_date === todayStr ? (res.yt_today_seconds || 0) : 0;
-                timeValEl.textContent = formatMinutes(todaySec);
-            }
-        });
+        if (isExtensionValid()) {
+            chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
+                if (!isExtensionValid()) return;
+                const timeValEl = card.querySelector("#yt-home-today-time");
+                if (timeValEl) {
+                    const todaySec = res.yt_today_date === todayStr ? (res.yt_today_seconds || 0) : 0;
+                    timeValEl.textContent = formatMinutes(todaySec);
+                }
+            });
+        }
 
         // মাউস কার্ডের ওপর রাখলে রোটেশন পজ করা যাতে পড়ার সুবিধা হয়
         const quoteWrap = card.querySelector("#yt-focus-quote-wrap");
@@ -771,6 +793,7 @@ function setupCommentsToggle() {
 
 // ১. দৈনিক কঠোর সময়সীমা এনফোর্সমেন্ট
 function checkDailyStrictLimit(todaySec) {
+    if (!isExtensionValid()) return;
     const todayStr = new Date().toISOString().slice(0, 10);
     const limitMin = Number(settings.dailyLimit) || 0;
 
@@ -794,8 +817,11 @@ function checkDailyStrictLimit(todaySec) {
             return;
         }
 
+        if (!isExtensionValid()) return;
+
         // সীমা শেষ হয়েছে! জরুরি ৫ মিনিটের পাস সক্রিয় কিনা পরীক্ষা
         chrome.storage.local.get(["emergency_pass_until"], (localData) => {
+            if (!isExtensionValid()) return;
             const passUntil = localData.emergency_pass_until || 0;
             const now = Date.now();
 
@@ -879,8 +905,9 @@ function checkDailyStrictLimit(todaySec) {
 
     if (todaySec !== undefined) {
         evaluateLimit(todaySec);
-    } else {
+    } else if (isExtensionValid()) {
         chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
+            if (!isExtensionValid()) return;
             const sec = res.yt_today_date === todayStr ? (res.yt_today_seconds || 0) : 0;
             evaluateLimit(sec);
         });
@@ -978,9 +1005,12 @@ function showPomodoroCompletedModal(mode) {
 }
 
 function updateFloatingPomodoroPill() {
-    chrome.storage.local.get(["pomo_state", "pomo_mode", "pomo_remaining", "pomo_target_time"], (data) => {
-        const state = data.pomo_state || "idle";
-        const mode = data.pomo_mode || "work";
+    if (!isExtensionValid()) return;
+    try {
+        chrome.storage.local.get(["pomo_state", "pomo_mode", "pomo_remaining", "pomo_target_time"], (data) => {
+            if (!isExtensionValid()) return;
+            const state = data.pomo_state || "idle";
+            const mode = data.pomo_mode || "work";
 
         if (state === "idle") {
             const pill = document.getElementById("yt-pomodoro-floating-pill");
@@ -1068,11 +1098,22 @@ function updateFloatingPomodoroPill() {
             });
         }
     });
+    } catch (e) {
+        if (!isExtensionValid() && typeof pomoInterval !== "undefined") {
+            clearInterval(pomoInterval);
+        }
+    }
 }
 
 // পোমোডোরো টাইমার শুরু করা
-setInterval(updateFloatingPomodoroPill, 1000);
-updateFloatingPomodoroPill();
+const pomoInterval = setInterval(() => {
+    if (!isExtensionValid()) {
+        clearInterval(pomoInterval);
+        return;
+    }
+    updateFloatingPomodoroPill();
+}, 1000);
+if (isExtensionValid()) updateFloatingPomodoroPill();
 
 // YouTube SPA নেভিগেশন হ্যান্ডলিং
 window.addEventListener("yt-navigate-finish", () => {
