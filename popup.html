@@ -15,7 +15,7 @@
       </div>
       <div class="brand-text">
         <h3>YouTube Focus</h3>
-        <span class="version-tag">v1.4</span>
+        <span class="version-tag">v1.5</span>
       </div>
     </div>
     <div class="status-pill" id="statusBadge">
@@ -24,7 +24,7 @@
     </div>
   </div>
 
-  <!-- Time Manager Widget (Option C) -->
+  <!-- Time Manager Widget -->
   <div class="time-card">
     <div class="time-card-top">
       <div class="time-title-wrap">
@@ -46,7 +46,63 @@
   </div>
 
   <div class="controls-list">
-    <!-- Group 1: Home & Shorts -->
+    <!-- Group: Pomodoro Timer (Option 3) -->
+    <div class="section-title">Pomodoro Focus Timer</div>
+
+    <div class="pomodoro-card">
+      <div class="pomo-card-top">
+        <div class="pomo-title-wrap">
+          <span class="pomo-icon" id="pomoIcon">🍅</span>
+          <span class="pomo-label" id="pomoModeLabel">Focus Session (২৫ মি:)</span>
+        </div>
+        <span class="pomo-time" id="pomoTimeDisplay">25:00</span>
+      </div>
+      <div class="pomo-btn-group">
+        <button type="button" class="pomo-btn pomo-btn-primary" id="pomoToggleBtn">▶ Start</button>
+        <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoResetBtn">🔄 Reset</button>
+        <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoSwitchModeBtn">☕ Break</button>
+      </div>
+    </div>
+
+    <!-- Group: Daily Limit & Breaks (Option 3 & C) -->
+    <div class="section-title">Strict Limit & Breaks</div>
+
+    <div class="control-card">
+      <div class="select-container">
+        <div class="label-info">
+          <span class="label-title">Daily Watch Limit</span>
+          <span class="label-desc">সীমা শেষ হলে ইউটিউব লক হবে</span>
+        </div>
+        <select id="selectDailyLimit" class="custom-select">
+          <option value="0">Off (সীমাহীন)</option>
+          <option value="30">৩০ মিনিট</option>
+          <option value="45">৪৫ মিনিট</option>
+          <option value="60">১ ঘণ্টা</option>
+          <option value="90">১.৫ ঘণ্টা</option>
+          <option value="120" selected>২ ঘণ্টা</option>
+          <option value="180">৩ ঘণ্টা</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="control-card">
+      <div class="select-container">
+        <div class="label-info">
+          <span class="label-title">Break Alert (বিরতি রিমাইন্ডার)</span>
+          <span class="label-desc">টানা দেখার পর সতর্কবার্তা</span>
+        </div>
+        <select id="selectBreakInterval" class="custom-select">
+          <option value="0">Off (বন্ধ)</option>
+          <option value="15">১৫ মিনিট</option>
+          <option value="20">২০ মিনিট</option>
+          <option value="30" selected>৩০ মিনিট</option>
+          <option value="45">৪৫ মিনিট</option>
+          <option value="60">১ ঘণ্টা</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Group: Home & Shorts -->
     <div class="section-title">Home & Shorts</div>
 
     <div class="control-card">
@@ -71,7 +127,7 @@
       </label>
     </div>
 
-    <!-- Group 2: Watch Page Clean Mode (Option 1) -->
+    <!-- Group: Watch Page Clean Mode (Option 1) -->
     <div class="section-title">Watch Page Clean Mode</div>
 
     <div class="control-card">
@@ -107,7 +163,7 @@
       </label>
     </div>
 
-    <!-- Group 3: Hadith & Focus -->
+    <!-- Group: Hadith & Focus -->
     <div class="section-title">Hadith & Wellbeing</div>
 
     <div class="control-card">
@@ -134,23 +190,6 @@
           <option value="15">১৫ সেকেন্ড</option>
           <option value="30">৩০ সেকেন্ড</option>
           <option value="60">১ মিনিট</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="control-card">
-      <div class="select-container">
-        <div class="label-info">
-          <span class="label-title">Break Alert (বিরতি রিমাইন্ডার)</span>
-          <span class="label-desc">টানা দেখার পর সতর্কবার্তা</span>
-        </div>
-        <select id="selectBreakInterval" class="custom-select">
-          <option value="0">Off (বন্ধ)</option>
-          <option value="15">১৫ মিনিট</option>
-          <option value="20">২০ মিনিট</option>
-          <option value="30" selected>৩০ মিনিট</option>
-          <option value="45">৪৫ মিনিট</option>
-          <option value="60">১ ঘণ্টা</option>
         </select>
       </div>
     </div>
