@@ -263,3 +263,117 @@ html[dark] .yt-focus-search-hint kbd {
         transform: scale(0.85);
     }
 }
+
+/* ==========================================================================
+   4. BREAK REMINDER MODAL & SCREEN TIME PILL (OPTION C)
+   ========================================================================== */
+.yt-break-modal-overlay {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999999;
+    animation: breakSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.yt-break-card {
+    display: flex;
+    flex-direction: column;
+    width: 320px;
+    background: var(--yt-spec-base-background, #ffffff);
+    border: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.1));
+    border-left: 4px solid #10b981;
+    border-radius: 14px;
+    padding: 16px;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.2), 0 2px 8px rgba(0, 0, 0, 0.06);
+    box-sizing: border-box;
+}
+
+html[dark] .yt-break-card {
+    background: #1e1e1e;
+    border-color: #333333;
+    border-left-color: #10b981;
+    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);
+}
+
+.yt-break-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+}
+
+.yt-break-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--yt-spec-text-primary, #111827);
+    margin: 0;
+}
+
+.yt-break-desc {
+    font-size: 13px;
+    color: var(--yt-spec-text-secondary, #6b7280);
+    line-height: 1.45;
+    margin: 0 0 12px 0;
+}
+
+.yt-break-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+.yt-break-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.yt-break-btn-primary {
+    background: #10b981;
+    color: #ffffff;
+}
+
+.yt-break-btn-primary:hover {
+    background: #059669;
+}
+
+.yt-break-btn-secondary {
+    background: var(--yt-spec-badge-chip-background, #f3f4f6);
+    color: var(--yt-spec-text-primary, #374151);
+}
+
+.yt-break-btn-secondary:hover {
+    background: var(--yt-spec-10-percent-layer, #e5e7eb);
+}
+
+/* Today's time badge on homepage */
+.yt-focus-time-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #10b981;
+    margin-bottom: 14px;
+}
+
+@keyframes breakSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}

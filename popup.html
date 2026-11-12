@@ -15,12 +15,33 @@
       </div>
       <div class="brand-text">
         <h3>YouTube Focus</h3>
-        <span class="version-tag">v1.1</span>
+        <span class="version-tag">v1.3</span>
       </div>
     </div>
     <div class="status-pill" id="statusBadge">
       <span class="status-dot"></span>
       <span class="status-text">ACTIVE</span>
+    </div>
+  </div>
+
+  <!-- Time Manager Widget (Option C) -->
+  <div class="time-card">
+    <div class="time-card-top">
+      <div class="time-title-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span class="time-card-label">Today on YouTube</span>
+      </div>
+      <span class="time-card-value" id="todayTimeDisplay">0m</span>
+    </div>
+    <div class="time-bar-bg">
+      <div class="time-bar-fill" id="timeBarFill" style="width: 0%;"></div>
+    </div>
+    <div class="time-card-footer">
+      <span id="sessionTimeText">Session: 0m</span>
+      <span id="dailyGoalText">Target: &lt; 2h</span>
     </div>
   </div>
 
@@ -65,8 +86,8 @@
     <div class="control-card">
       <div class="select-container">
         <div class="label-info">
-          <span class="label-title">Auto-Rotate (স্বয়ংক্রিয় পরিবর্তন)</span>
-          <span class="label-desc">হাদিস পরিবর্তনের সময়সীমা</span>
+          <span class="label-title">Auto-Rotate (হাদিস পরিবর্তন)</span>
+          <span class="label-desc">স্বয়ংক্রিয় পরিবর্তনের সময়সীমা</span>
         </div>
         <select id="selectInterval" class="custom-select">
           <option value="0">Off (ম্যানুয়াল)</option>
@@ -75,6 +96,24 @@
           <option value="15">১৫ সেকেন্ড</option>
           <option value="30">৩০ সেকেন্ড</option>
           <option value="60">১ মিনিট</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Option 5: Break Reminder (Option C) -->
+    <div class="control-card">
+      <div class="select-container">
+        <div class="label-info">
+          <span class="label-title">Break Alert (বিরতি রিমাইন্ডার)</span>
+          <span class="label-desc">টানা দেখার পর সতর্কবার্তা</span>
+        </div>
+        <select id="selectBreakInterval" class="custom-select">
+          <option value="0">Off (বন্ধ)</option>
+          <option value="15">১৫ মিনিট</option>
+          <option value="20">২০ মিনিট</option>
+          <option value="30" selected>৩০ মিনিট</option>
+          <option value="45">৪৫ মিনিট</option>
+          <option value="60">১ ঘণ্টা</option>
         </select>
       </div>
     </div>

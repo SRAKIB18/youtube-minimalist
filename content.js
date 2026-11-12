@@ -3,7 +3,8 @@ let settings = {
     hideFeed: true,
     hideShorts: true,
     showQuotes: true,
-    autoInterval: 10
+    autoInterval: 10,
+    breakInterval: 30
 };
 
 // সহীহ হাদিস ও অনুপ্রেরণামূলক বাণী (বাংলায়)
@@ -301,11 +302,12 @@ function updateAttributes() {
 updateAttributes();
 
 // স্টোরেজ থেকে ইউজারের সেটিংস লোড করা
-chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes", "autoInterval"], (data) => {
+chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes", "autoInterval", "breakInterval"], (data) => {
     if (data.hideFeed !== undefined) settings.hideFeed = data.hideFeed;
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
     if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
+    if (data.breakInterval !== undefined) settings.breakInterval = data.breakInterval;
     updateAttributes();
     applyFocusMode();
 });
@@ -319,6 +321,10 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
         if (changes.autoInterval !== undefined) {
             settings.autoInterval = changes.autoInterval.newValue;
             restartAutoRotateTimer();
+        }
+        if (changes.breakInterval !== undefined) {
+            settings.breakInterval = changes.breakInterval.newValue;
+            resetBreakThreshold();
         }
         updateAttributes();
         applyFocusMode();
