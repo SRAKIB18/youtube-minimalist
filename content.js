@@ -2,6 +2,9 @@
 let settings = {
     hideFeed: true,
     hideShorts: true,
+    hideRelated: true,
+    hideComments: true,
+    disableAutoplay: true,
     showQuotes: true,
     autoInterval: 10,
     breakInterval: 30
@@ -295,6 +298,9 @@ const HADITH_QUOTES = [
 function updateAttributes() {
     document.documentElement.setAttribute("data-hide-feed", settings.hideFeed ? "true" : "false");
     document.documentElement.setAttribute("data-hide-shorts", settings.hideShorts ? "true" : "false");
+    document.documentElement.setAttribute("data-hide-related", settings.hideRelated ? "true" : "false");
+    document.documentElement.setAttribute("data-hide-comments", settings.hideComments ? "true" : "false");
+    document.documentElement.setAttribute("data-disable-autoplay", settings.disableAutoplay ? "true" : "false");
     document.documentElement.setAttribute("data-show-quotes", settings.showQuotes ? "true" : "false");
 }
 
@@ -302,9 +308,21 @@ function updateAttributes() {
 updateAttributes();
 
 // স্টোরেজ থেকে ইউজারের সেটিংস লোড করা
-chrome.storage.sync.get(["hideFeed", "hideShorts", "showQuotes", "autoInterval", "breakInterval"], (data) => {
+chrome.storage.sync.get([
+    "hideFeed",
+    "hideShorts",
+    "hideRelated",
+    "hideComments",
+    "disableAutoplay",
+    "showQuotes",
+    "autoInterval",
+    "breakInterval"
+], (data) => {
     if (data.hideFeed !== undefined) settings.hideFeed = data.hideFeed;
     if (data.hideShorts !== undefined) settings.hideShorts = data.hideShorts;
+    if (data.hideRelated !== undefined) settings.hideRelated = data.hideRelated;
+    if (data.hideComments !== undefined) settings.hideComments = data.hideComments;
+    if (data.disableAutoplay !== undefined) settings.disableAutoplay = data.disableAutoplay;
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
     if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
     if (data.breakInterval !== undefined) settings.breakInterval = data.breakInterval;
@@ -317,6 +335,15 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
     if (areaName === "sync") {
         if (changes.hideFeed !== undefined) settings.hideFeed = changes.hideFeed.newValue;
         if (changes.hideShorts !== undefined) settings.hideShorts = changes.hideShorts.newValue;
+        if (changes.hideRelated !== undefined) settings.hideRelated = changes.hideRelated.newValue;
+        if (changes.hideComments !== undefined) {
+            settings.hideComments = changes.hideComments.newValue;
+            setupCommentsToggle();
+        }
+        if (changes.disableAutoplay !== undefined) {
+            settings.disableAutoplay = changes.disableAutoplay.newValue;
+            if (settings.disableAutoplay) disableAutoplay();
+        }
         if (changes.showQuotes !== undefined) settings.showQuotes = changes.showQuotes.newValue;
         if (changes.autoInterval !== undefined) {
             settings.autoInterval = changes.autoInterval.newValue;
@@ -333,6 +360,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
 
 function applyFocusMode() {
     const isHomePage = window.location.pathname === "/" || window.location.pathname === "";
+    const isWatchPage = window.location.pathname.startsWith("/watch");
 
     // হোম ফিড টগল হ্যান্ডলিং
     if (isHomePage && settings.hideFeed) {
@@ -346,7 +374,17 @@ function applyFocusMode() {
         const videoId = window.location.pathname.split("/shorts/")[1]?.split("?")[0];
         if (videoId) {
             window.location.replace(`https://www.youtube.com/watch?v=${videoId}`);
+            return;
         }
+    }
+
+    // ওয়াচ পেজ ক্লিন মোড হ্যান্ডলিং (Option 1)
+    if (isWatchPage) {
+        if (settings.disableAutoplay) {
+            disableAutoplay();
+            attachVideoEndHandler();
+        }
+        setupCommentsToggle();
     }
 }
 
@@ -650,15 +688,125 @@ window.addEventListener("keydown", (e) => {
     }
 });
 
+// ==========================================================================
+// WATCH PAGE CLEAN MODE HELPERS (OPTION 1)
+// ==========================================================================
+function disableAutoplay() {
+    if (!settings.disableAutoplay) return;
+    if (!window.location.pathname.startsWith("/watch")) return;
+
+    const tryDisable = () => {
+        const autonavBtn = document.querySelector(
+            'button[data-tooltip-target-id="ytp-autonav-toggle-button"], .ytp-autonav-toggle-button'
+        );
+        if (autonavBtn) {
+            const isChecked = autonavBtn.getAttribute("aria-checked") === "true" ||
+                              autonavBtn.getAttribute("aria-pressed") === "true";
+            if (isChecked) {
+                autonavBtn.click();
+            }
+        }
+    };
+
+    tryDisable();
+    setTimeout(tryDisable, 600);
+    setTimeout(tryDisable, 1500);
+}
+
+function attachVideoEndHandler() {
+    const video = document.querySelector("video.html5-main-video, video");
+    if (video && !video.dataset.hasEndHandler) {
+        video.dataset.hasEndHandler = "true";
+        video.addEventListener("ended", () => {
+            if (settings.disableAutoplay) {
+                const cancelBtn = document.querySelector(
+                    ".ytp-autonav-endscreen-up-next-cancel-button, .ytp-autonav-cancel-button"
+                );
+                if (cancelBtn) cancelBtn.click();
+            }
+        });
+    }
+}
+
+function setupCommentsToggle() {
+    const isWatchPage = window.location.pathname.startsWith("/watch");
+    const existingPill = document.getElementById("yt-toggle-comments-pill");
+
+    if (!isWatchPage || !settings.hideComments) {
+        if (existingPill) {
+            const wrap = existingPill.closest(".yt-toggle-comments-wrap");
+            if (wrap) wrap.remove();
+            else existingPill.remove();
+        }
+        return;
+    }
+
+    if (existingPill) return;
+
+    const commentsSection = document.querySelector(
+        "ytd-watch-flexy #comments, ytd-watch-grid #comments, ytd-comments, #comments"
+    );
+    if (!commentsSection) return;
+
+    const wrap = document.createElement("div");
+    wrap.className = "yt-toggle-comments-wrap";
+    wrap.innerHTML = `
+        <button type="button" id="yt-toggle-comments-pill" class="yt-toggle-comments-pill">
+            <span id="yt-comments-icon">💬</span>
+            <span id="yt-comments-text">কমেন্ট দেখুন (Show Comments)</span>
+        </button>
+    `;
+
+    commentsSection.parentNode.insertBefore(wrap, commentsSection);
+
+    const btn = wrap.querySelector("#yt-toggle-comments-pill");
+    const textSpan = wrap.querySelector("#yt-comments-text");
+    const iconSpan = wrap.querySelector("#yt-comments-icon");
+
+    btn.addEventListener("click", () => {
+        const isRevealed = document.documentElement.getAttribute("data-comments-revealed") === "true";
+        if (isRevealed) {
+            document.documentElement.setAttribute("data-comments-revealed", "false");
+            textSpan.textContent = "কমেন্ট দেখুন (Show Comments)";
+            iconSpan.textContent = "💬";
+        } else {
+            document.documentElement.setAttribute("data-comments-revealed", "true");
+            textSpan.textContent = "কমেন্ট হাইড করুন (Hide Comments)";
+            iconSpan.textContent = "🙈";
+            commentsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+    });
+}
+
 // YouTube SPA নেভিগেশন হ্যান্ডলিং
-window.addEventListener("yt-navigate-finish", applyFocusMode);
+window.addEventListener("yt-navigate-finish", () => {
+    document.documentElement.setAttribute("data-comments-revealed", "false");
+    const existingPill = document.getElementById("yt-toggle-comments-pill");
+    if (existingPill) {
+        const wrap = existingPill.closest(".yt-toggle-comments-wrap");
+        if (wrap) wrap.remove();
+        else existingPill.remove();
+    }
+    applyFocusMode();
+});
 window.addEventListener("popstate", applyFocusMode);
 
 // DOM পর্যবেক্ষণ করা
 const observer = new MutationObserver(() => {
     const isHomePage = window.location.pathname === "/" || window.location.pathname === "";
+    const isWatchPage = window.location.pathname.startsWith("/watch");
+
     if (isHomePage && settings.hideFeed) {
         injectPlaceholder();
+    }
+
+    if (isWatchPage) {
+        if (settings.hideComments && !document.getElementById("yt-toggle-comments-pill")) {
+            setupCommentsToggle();
+        }
+        if (settings.disableAutoplay) {
+            attachVideoEndHandler();
+        }
     }
 });
 

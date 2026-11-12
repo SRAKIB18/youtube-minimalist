@@ -377,3 +377,85 @@ html[dark] .yt-break-card {
         transform: translateY(0) scale(1);
     }
 }
+
+/* ==========================================================================
+   5. WATCH PAGE CLEAN MODE (OPTION 1)
+   ========================================================================== */
+/* 5.1 Hide Sidebar / Related Recommendations on Watch Page */
+html[data-hide-related="true"] ytd-watch-flexy #secondary #related,
+html[data-hide-related="true"] ytd-watch-grid #secondary #related,
+html[data-hide-related="true"] #secondary #related,
+html[data-hide-related="true"] #related,
+html[data-hide-related="true"] ytd-watch-next-secondary-results-renderer,
+html[data-hide-related="true"] ytd-item-section-renderer[section-identifier="related-items"] {
+    display: none !important;
+}
+
+/* 5.2 Hide End-Screen Video Overlays & Suggestion Cards */
+html[data-hide-related="true"] .ytp-ce-element,
+html[data-hide-related="true"] .ytp-endscreen-content,
+html[data-hide-related="true"] .ytp-ce-covering-overlay,
+html[data-hide-related="true"] .ytp-ce-element-show,
+html[data-hide-related="true"] .ytp-ce-video,
+html[data-hide-related="true"] .ytp-ce-channel,
+html[data-hide-related="true"] .ytp-ce-expanding-overlay,
+html[data-hide-related="true"] .ytp-autonav-endscreen-button-container {
+    display: none !important;
+}
+
+/* 5.3 Hide Comments Section (unless revealed by inline button) */
+html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-watch-flexy #comments,
+html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-watch-grid #comments,
+html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-comments,
+html[data-hide-comments="true"]:not([data-comments-revealed="true"]) #comments {
+    display: none !important;
+}
+
+/* 5.4 Autoplay Cancel & Countdown Overlay */
+html[data-disable-autoplay="true"] .ytp-autonav-endscreen-countdown-container,
+html[data-disable-autoplay="true"] .ytp-autonav-endscreen-button-container {
+    display: none !important;
+}
+
+/* 5.5 Inline Comments Toggle Button */
+.yt-toggle-comments-wrap {
+    display: flex;
+    justify-content: center;
+    margin: 28px 0 20px 0;
+    width: 100%;
+}
+
+html[data-hide-comments="false"] .yt-toggle-comments-wrap {
+    display: none !important;
+}
+
+.yt-toggle-comments-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 22px;
+    background: var(--yt-spec-badge-chip-background, #f2f2f2);
+    border: 1px solid var(--yt-spec-10-percent-layer, rgba(0, 0, 0, 0.1));
+    border-radius: 9999px;
+    color: var(--yt-spec-text-primary, #0f0f0f);
+    font-size: 13.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    font-family: inherit;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+html[dark] .yt-toggle-comments-pill {
+    background: #272727;
+    border-color: #3f3f3f;
+    color: #f1f1f1;
+}
+
+.yt-toggle-comments-pill:hover {
+    background: rgba(16, 185, 129, 0.12);
+    border-color: #10b981;
+    color: #10b981;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+}

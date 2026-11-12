@@ -15,7 +15,7 @@
       </div>
       <div class="brand-text">
         <h3>YouTube Focus</h3>
-        <span class="version-tag">v1.3</span>
+        <span class="version-tag">v1.4</span>
       </div>
     </div>
     <div class="status-pill" id="statusBadge">
@@ -46,7 +46,9 @@
   </div>
 
   <div class="controls-list">
-    <!-- Option 1: Hide Feed -->
+    <!-- Group 1: Home & Shorts -->
+    <div class="section-title">Home & Shorts</div>
+
     <div class="control-card">
       <label class="switch-container">
         <div class="label-info">
@@ -58,7 +60,6 @@
       </label>
     </div>
 
-    <!-- Option 2: Hide Shorts -->
     <div class="control-card">
       <label class="switch-container">
         <div class="label-info">
@@ -70,7 +71,45 @@
       </label>
     </div>
 
-    <!-- Option 3: Daily Hadith -->
+    <!-- Group 2: Watch Page Clean Mode (Option 1) -->
+    <div class="section-title">Watch Page Clean Mode</div>
+
+    <div class="control-card">
+      <label class="switch-container">
+        <div class="label-info">
+          <span class="label-title">Hide Related Videos</span>
+          <span class="label-desc">Sidebar suggestions & end-screen cards</span>
+        </div>
+        <input type="checkbox" id="toggleRelated" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="control-card">
+      <label class="switch-container">
+        <div class="label-info">
+          <span class="label-title">Hide Comments</span>
+          <span class="label-desc">Video comments (toggle button on video)</span>
+        </div>
+        <input type="checkbox" id="toggleComments" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="control-card">
+      <label class="switch-container">
+        <div class="label-info">
+          <span class="label-title">Disable Autoplay</span>
+          <span class="label-desc">Prevents auto-playing next video</span>
+        </div>
+        <input type="checkbox" id="toggleAutoplay" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <!-- Group 3: Hadith & Focus -->
+    <div class="section-title">Hadith & Wellbeing</div>
+
     <div class="control-card">
       <label class="switch-container">
         <div class="label-info">
@@ -82,7 +121,6 @@
       </label>
     </div>
 
-    <!-- Option 4: Auto-Rotate Timer -->
     <div class="control-card">
       <div class="select-container">
         <div class="label-info">
@@ -100,7 +138,6 @@
       </div>
     </div>
 
-    <!-- Option 5: Break Reminder (Option C) -->
     <div class="control-card">
       <div class="select-container">
         <div class="label-info">

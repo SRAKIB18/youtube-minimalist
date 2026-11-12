@@ -17,6 +17,11 @@ A lightweight, distraction-free **Google Chrome Extension (Manifest V3)** that e
 YouTube's homepage and endless Shorts feed are engineered to keep you hooked and scrolling for hours. **YouTube Minimalist** reclaims your attention:
 - 🚫 **No Home Feed:** You won't get trapped by clickbait thumbnails or algorithmic video recommendations.
 - 🚫 **No Shorts & Reels:** Shorts are hidden everywhere — navigation bar, search results, channel tabs, and watch pages.
+- 🎬 **Watch Page Clean Mode (ওয়াচ পেজ ক্লিন মোড):**
+  - **No Sidebar Clickbait:** Hides right-side recommended/related videos so you stay focused on what you're watching.
+  - **No End-Screen Overlays:** Blocks annoying thumbnail cards blocking the final seconds of videos.
+  - **Hidden Comments with Quick Toggle:** Comments are hidden by default; click the sleek inline button `"💬 কমেন্ট দেখুন"` anytime if you wish to read them.
+  - **Auto-Disable Autoplay:** Prevents YouTube from automatically playing endless videos when one ends.
 - 🔍 **Top Search Bar Preserved:** Only the top search bar is visible, keeping the interface minimal and distraction-free.
 - 📖 **70+ Sahih Hadith Collection (বাংলায় ৭০+ সহীহ হাদিস):** Displays authentic, motivational Hadith on time management, hard work, patience, and intentional focus.
 - ⏱️ **Auto-Rotating Hadith Timer (স্বয়ংক্রিয় পরিবর্তন):** Automatically rotates Hadiths every 5s, 10s, 15s, 30s, or 1m — customizable via popup with hover-pause protection!
@@ -87,7 +92,12 @@ In the top-right corner of the Extensions page, switch the **Developer mode** to
 Click the extension icon in your Chrome toolbar to open the control panel:
 - **Hide Home Feed:** Toggle to show/hide the homepage video recommendations and category filter chips.
 - **Hide Shorts & Reels:** Toggle to show/hide Shorts buttons, reels shelves, and channel Shorts tabs.
-- **Motivational Quotes:** Toggle to show or hide the daily inspirational quote card.
+- **Hide Related Videos:** Toggle sidebar suggested videos and end-screen video overlay cards on watch pages.
+- **Hide Comments:** Toggle the comments section under videos (also toggleable inline on the video page).
+- **Disable Autoplay:** Prevents YouTube from automatically advancing to the next video when the current video ends.
+- **Daily Hadith:** Toggle to show or hide the daily inspiring Hadith card on the homepage.
+- **Auto-Rotate Interval:** Choose Hadith rotation frequency (5s, 10s, 15s, 30s, 1m, or Off).
+- **Break Alert Interval:** Set healthy eye-rest break reminders (15m, 20m, 30m, 45m, 1h, or Off).
 - **Instant Response:** All changes apply **instantly in real time** without refreshing the page!
 
 ### ⌨️ Keyboard Shortcuts
