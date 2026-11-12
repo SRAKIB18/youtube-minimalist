@@ -418,6 +418,127 @@ function restartAutoRotateTimer() {
     startAutoRotateTimer();
 }
 
+// ==========================================================================
+// OPTION C: TIME TRACKING & BREAK REMINDER
+// ==========================================================================
+let sessionSeconds = 0;
+let nextBreakThreshold = 0;
+let isBreakModalShown = false;
+
+function resetBreakThreshold() {
+    const intervalMin = Number(settings.breakInterval) || 0;
+    if (intervalMin > 0) {
+        nextBreakThreshold = sessionSeconds + (intervalMin * 60);
+    } else {
+        nextBreakThreshold = 0;
+    }
+}
+
+// মৃদু অ্যালার্ট সাউন্ড (Web Audio API)
+function playBreakChime() {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(523.25, now); // C5
+        osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.25); // G5
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start(now);
+        osc.stop(now + 0.8);
+    } catch (e) {}
+}
+
+function showBreakModal(mins) {
+    if (document.getElementById("yt-break-modal") || isBreakModalShown) return;
+    isBreakModalShown = true;
+
+    const modal = document.createElement("div");
+    modal.id = "yt-break-modal";
+    modal.className = "yt-break-modal-overlay";
+    modal.innerHTML = `
+        <div class="yt-break-card">
+            <div class="yt-break-header">
+                <span style="font-size: 18px;">⏱️</span>
+                <h4 class="yt-break-title">বিরতি নেওয়ার সময় হয়েছে</h4>
+            </div>
+            <p class="yt-break-desc">আপনি একটানা <b>${mins} মিনিট</b> ইউটিউবে আছেন। চোখের বিশ্রাম নিন এবং একটু হেঁটে আসুন।</p>
+            <div class="yt-break-actions">
+                <button type="button" class="yt-break-btn yt-break-btn-secondary" id="yt-break-snooze">১০ মিনিট পর</button>
+                <button type="button" class="yt-break-btn yt-break-btn-primary" id="yt-break-dismiss">ঠিক আছে</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.querySelector("#yt-break-dismiss").addEventListener("click", () => {
+        modal.remove();
+        isBreakModalShown = false;
+    });
+
+    modal.querySelector("#yt-break-snooze").addEventListener("click", () => {
+        modal.remove();
+        isBreakModalShown = false;
+        nextBreakThreshold = sessionSeconds + (10 * 60);
+    });
+}
+
+function formatMinutes(seconds) {
+    if (!seconds || seconds < 60) return "< 1m";
+    const mins = Math.floor(seconds / 60);
+    if (mins < 60) return `${mins}m`;
+    const hours = Math.floor(mins / 60);
+    const remMins = mins % 60;
+    return remMins > 0 ? `${hours}h ${remMins}m` : `${hours}h`;
+}
+
+// প্রতি ৫ সেকেন্ডে সক্রিয় স্ক্রিন টাইম ট্র্যাক করা
+setInterval(() => {
+    if (document.visibilityState !== "visible") return;
+
+    sessionSeconds += 5;
+
+    // ব্রেক রিমাইন্ডার চেক
+    const intervalMin = Number(settings.breakInterval) || 0;
+    if (intervalMin > 0) {
+        if (nextBreakThreshold === 0) {
+            nextBreakThreshold = intervalMin * 60;
+        }
+        if (sessionSeconds >= nextBreakThreshold && !isBreakModalShown) {
+            showBreakModal(Math.round(sessionSeconds / 60));
+            playBreakChime();
+            nextBreakThreshold += (intervalMin * 60);
+        }
+    }
+
+    // লোকাল স্টোরেজে দৈনিক সময় আপডেট করা
+    const todayStr = new Date().toISOString().slice(0, 10);
+    chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
+        let currentTodaySec = 0;
+        if (res.yt_today_date === todayStr) {
+            currentTodaySec = (res.yt_today_seconds || 0) + 5;
+        } else {
+            currentTodaySec = 5; // নতুন দিন শুরু হলে রিসেট
+        }
+
+        chrome.storage.local.set({
+            yt_today_date: todayStr,
+            yt_today_seconds: currentTodaySec,
+            yt_session_seconds: sessionSeconds
+        });
+
+        // হোমপেজে টাইম পিল আপডেট
+        const timeValEl = document.getElementById("yt-home-today-time");
+        if (timeValEl) {
+            timeValEl.textContent = formatMinutes(currentTodaySec);
+        }
+    });
+}, 5000);
+
 function injectPlaceholder() {
     if (document.getElementById("yt-focus-welcome-card")) return;
 
@@ -432,6 +553,12 @@ function injectPlaceholder() {
             <div class="yt-focus-badge">
                 <span class="pulse-dot"></span>
                 <span>ফোকাস স্পেস</span>
+            </div>
+
+            <!-- আজকের স্ক্রিন টাইম ব্যাজ -->
+            <div class="yt-focus-time-pill">
+                <span>⏱️ আজকের স্ক্রিন টাইম:</span>
+                <span id="yt-home-today-time" style="font-weight: 700; margin-left: 3px;">লোড হচ্ছে...</span>
             </div>
 
             <div class="yt-focus-header">
@@ -460,6 +587,16 @@ function injectPlaceholder() {
             </div>
         `;
         browse.prepend(card);
+
+        // হোমপেজে স্ক্রিন টাইম তাৎক্ষণিক প্রদর্শন
+        const todayStr = new Date().toISOString().slice(0, 10);
+        chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
+            const timeValEl = card.querySelector("#yt-home-today-time");
+            if (timeValEl) {
+                const todaySec = res.yt_today_date === todayStr ? (res.yt_today_seconds || 0) : 0;
+                timeValEl.textContent = formatMinutes(todaySec);
+            }
+        });
 
         // মাউস কার্ডের ওপর রাখলে রোটেশন পজ করা যাতে পড়ার সুবিধা হয়
         const quoteWrap = card.querySelector("#yt-focus-quote-wrap");
