@@ -409,53 +409,7 @@ html[data-hide-next="true"] a.ytp-next-button {
     display: none !important;
 }
 
-/* 5.4 Hide Player Replay Button (Option to toggle) */
-/* Control bar replay button */
-html[data-hide-replay="true"] .html5-video-player.ended-mode .ytp-play-button,
-html[data-hide-replay="true"] #movie_player.ended-mode .ytp-play-button,
-html[data-hide-replay="true"] .ytp-play-button:has(path[d*="18,11"]),
-html[data-hide-replay="true"] .ytp-play-button:has(path[d*="18 11"]),
-html[data-hide-replay="true"] .ytp-play-button:has(path[d*="M 18,11"]),
-html[data-hide-replay="true"] .ytp-play-button:has(path[d*="M18,11"]),
-html[data-hide-replay="true"] .ytp-play-button[data-title-no-tooltip*="Replay" i],
-html[data-hide-replay="true"] .ytp-play-button[data-tooltip-title*="Replay" i],
-html[data-hide-replay="true"] .ytp-play-button[title*="Replay" i],
-html[data-hide-replay="true"] .ytp-play-button[aria-label*="Replay" i],
-html[data-hide-replay="true"] .ytp-play-button[data-title-no-tooltip*="পুনরায়"],
-html[data-hide-replay="true"] .ytp-play-button[data-title-no-tooltip*="পুনরায়"],
-html[data-hide-replay="true"] .ytp-play-button[data-tooltip-title*="পুনরায়"],
-html[data-hide-replay="true"] .ytp-play-button[data-tooltip-title*="পুনরায়"],
-html[data-hide-replay="true"] .ytp-play-button[title*="পুনরায়"],
-html[data-hide-replay="true"] .ytp-play-button[title*="পুনরায়"],
-html[data-hide-replay="true"] button.ytp-play-button[aria-label*="পুনরায়"],
-html[data-hide-replay="true"] button.ytp-play-button[aria-label*="পুনরায়"],
-html[data-hide-replay="true"][data-video-ended="true"] .ytp-play-button,
-
-/* Center screen & endscreen replay buttons */
-html[data-hide-replay="true"] .html5-video-player.ended-mode .ytp-large-play-button,
-html[data-hide-replay="true"] #movie_player.ended-mode .ytp-large-play-button,
-html[data-hide-replay="true"] .html5-video-player.ended-mode .ytp-upnext-replay-button,
-html[data-hide-replay="true"] .ytp-upnext-replay-button,
-html[data-hide-replay="true"] a.ytp-upnext-replay-button,
-html[data-hide-replay="true"] button.ytp-upnext-replay-button,
-html[data-hide-replay="true"] .ytp-endscreen-replay-button,
-html[data-hide-replay="true"] button.ytp-endscreen-replay-button,
-html[data-hide-replay="true"] .ytp-replay-button,
-html[data-hide-replay="true"] button.ytp-replay-button,
-html[data-hide-replay="true"] .ytp-autonav-endscreen-button-container,
-html[data-hide-replay="true"] .ytp-large-play-button:has(path[d*="18,11"]),
-html[data-hide-replay="true"] .ytp-large-play-button:has(path[d*="18 11"]),
-html[data-hide-replay="true"] .ytp-bezel:has(path[d*="18,11"]),
-html[data-hide-replay="true"] .ytp-bezel:has(path[d*="18 11"]),
-html[data-hide-replay="true"][data-video-ended="true"] .ytp-large-play-button,
-html[data-hide-replay="true"][data-video-ended="true"] .ytp-upnext-replay-button {
-    display: none !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    visibility: hidden !important;
-}
-
-/* 5.3 Hide Comments Section (unless revealed by inline button) */
+/* 5.4 Hide Comments Section (unless revealed by inline button) */
 html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-watch-flexy #comments,
 html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-watch-grid #comments,
 html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-comments,
