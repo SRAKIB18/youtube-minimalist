@@ -44,6 +44,14 @@ function formatTimer(seconds) {
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 
+const ICONS = {
+  focus: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`,
+  break: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line></svg>`,
+  play: `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`,
+  pause: `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`,
+  warning: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-left:4px;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`
+};
+
 function updateTimeDisplay() {
   chrome.storage.local.get(["yt_today_seconds", "yt_session_seconds", "yt_today_date"], (res) => {
     const todayStr = new Date().toISOString().slice(0, 10);
@@ -72,7 +80,7 @@ function updateTimeDisplay() {
       timeBarFill.style.width = pct + "%";
       if (limitMin > 0 && todaySec >= limitSec) {
         timeBarFill.style.background = "linear-gradient(90deg, #ef4444, #dc2626)";
-        if (dailyGoalText) dailyGoalText.textContent = "Limit Reached! 🛑";
+        if (dailyGoalText) dailyGoalText.innerHTML = `Limit Reached! ${ICONS.warning}`;
       } else if (pct >= 80) {
         timeBarFill.style.background = "linear-gradient(90deg, #f59e0b, #d97706)";
       } else {
@@ -109,14 +117,14 @@ function updatePomodoroUI() {
     if (pomoCard) {
       if (mode === "break") {
         pomoCard.classList.add("pomo-break-mode");
-        if (pomoIcon) pomoIcon.textContent = "☕";
+        if (pomoIcon) pomoIcon.innerHTML = ICONS.break;
         if (pomoModeLabel) pomoModeLabel.textContent = `Break Time (${cachedPomoBreak} মি:)`;
-        if (pomoSwitchModeBtn) pomoSwitchModeBtn.textContent = "🍅 Focus";
+        if (pomoSwitchModeBtn) pomoSwitchModeBtn.innerHTML = `${ICONS.focus}<span>Focus</span>`;
       } else {
         pomoCard.classList.remove("pomo-break-mode");
-        if (pomoIcon) pomoIcon.textContent = "🍅";
+        if (pomoIcon) pomoIcon.innerHTML = ICONS.focus;
         if (pomoModeLabel) pomoModeLabel.textContent = `Focus Session (${cachedPomoWork} মি:)`;
-        if (pomoSwitchModeBtn) pomoSwitchModeBtn.textContent = "☕ Break";
+        if (pomoSwitchModeBtn) pomoSwitchModeBtn.innerHTML = `${ICONS.break}<span>Break</span>`;
       }
     }
 
@@ -127,12 +135,12 @@ function updatePomodoroUI() {
     if (state === "running" && data.pomo_target_time) {
       currentSeconds = Math.max(0, Math.round((data.pomo_target_time - Date.now()) / 1000));
       if (pomoToggleBtn) {
-        pomoToggleBtn.textContent = "⏸ Pause";
+        pomoToggleBtn.innerHTML = `${ICONS.pause}<span>Pause</span>`;
         pomoToggleBtn.classList.add("is-running");
       }
     } else {
       if (pomoToggleBtn) {
-        pomoToggleBtn.textContent = "▶ Start";
+        pomoToggleBtn.innerHTML = `${ICONS.play}<span>Start</span>`;
         pomoToggleBtn.classList.remove("is-running");
       }
     }

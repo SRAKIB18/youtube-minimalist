@@ -52,7 +52,12 @@
     <div class="pomodoro-card">
       <div class="pomo-card-top">
         <div class="pomo-title-wrap">
-          <span class="pomo-icon" id="pomoIcon">🍅</span>
+          <span class="pomo-icon" id="pomoIcon">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+          </span>
           <span class="pomo-label" id="pomoModeLabel">Focus Session</span>
         </div>
         <span class="pomo-time" id="pomoTimeDisplay">25:00</span>
@@ -61,7 +66,12 @@
       <!-- Custom Pomodoro Durations -->
       <div class="pomo-duration-row">
         <div class="pomo-duration-item">
-          <label for="selectPomoWork">🍅 Focus:</label>
+          <label for="selectPomoWork">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 3px;">
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>Focus:
+          </label>
           <select id="selectPomoWork" class="pomo-mini-select">
             <option value="15">১৫ মি:</option>
             <option value="20">২০ মি:</option>
@@ -73,7 +83,15 @@
           </select>
         </div>
         <div class="pomo-duration-item">
-          <label for="selectPomoBreak">☕ Break:</label>
+          <label for="selectPomoBreak">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: -1px; margin-right: 3px;">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>Break:
+          </label>
           <select id="selectPomoBreak" class="pomo-mini-select">
             <option value="3">৩ মি:</option>
             <option value="5" selected>৫ মি:</option>
@@ -84,9 +102,29 @@
       </div>
 
       <div class="pomo-btn-group">
-        <button type="button" class="pomo-btn pomo-btn-primary" id="pomoToggleBtn">▶ Start</button>
-        <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoResetBtn">🔄 Reset</button>
-        <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoSwitchModeBtn">☕ Break</button>
+        <button type="button" class="pomo-btn pomo-btn-primary" id="pomoToggleBtn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor">
+            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+          </svg>
+          <span id="pomoToggleBtnText">Start</span>
+        </button>
+        <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoResetBtn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          <span>Reset</span>
+        </button>
+        <button type="button" class="pomo-btn pomo-btn-secondary" id="pomoSwitchModeBtn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+            <line x1="6" y1="1" x2="6" y2="4"></line>
+            <line x1="10" y1="1" x2="10" y2="4"></line>
+            <line x1="14" y1="1" x2="14" y2="4"></line>
+          </svg>
+          <span id="pomoSwitchModeText">Break</span>
+        </button>
       </div>
     </div>
 

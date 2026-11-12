@@ -530,7 +530,12 @@ function showBreakModal(mins) {
     modal.innerHTML = `
         <div class="yt-break-card">
             <div class="yt-break-header">
-                <span style="font-size: 18px;">⏱️</span>
+                <span class="yt-break-icon-wrap" style="display:inline-flex; align-items:center;">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </span>
                 <h4 class="yt-break-title">বিরতি নেওয়ার সময় হয়েছে</h4>
             </div>
             <p class="yt-break-desc">আপনি একটানা <b>${mins} মিনিট</b> ইউটিউবে আছেন। চোখের বিশ্রাম নিন এবং একটু হেঁটে আসুন।</p>
@@ -637,7 +642,13 @@ function injectPlaceholder() {
 
             <!-- আজকের স্ক্রিন টাইম ব্যাজ -->
             <div class="yt-focus-time-pill">
-                <span>⏱️ আজকের স্ক্রিন টাইম:</span>
+                <span style="display:inline-flex; align-items:center; gap:4px;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    আজকের স্ক্রিন টাইম:
+                </span>
                 <span id="yt-home-today-time" style="font-weight: 700; margin-left: 3px;">লোড হচ্ছে...</span>
             </div>
 
@@ -648,7 +659,9 @@ function injectPlaceholder() {
 
             <!-- হাদিস ও ইসলামিক বাণী কার্ড -->
             <div class="yt-focus-quote-wrap" id="yt-focus-quote-wrap">
-                <span class="yt-focus-quote-icon">❝</span>
+                <svg class="yt-focus-quote-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+                </svg>
                 <p class="yt-focus-quote-text" id="yt-quote-text">${hadith.text}</p>
                 <div class="yt-focus-quote-footer">
                     <span class="yt-focus-quote-author" id="yt-quote-author">— ${hadith.source}</span>
@@ -762,11 +775,14 @@ function setupCommentsToggle() {
     );
     if (!commentsSection) return;
 
+    const SVG_CHAT = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>`;
+    const SVG_EYE_OFF = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="23" x2="23" y2="1"></line></svg>`;
+
     const wrap = document.createElement("div");
     wrap.className = "yt-toggle-comments-wrap";
     wrap.innerHTML = `
         <button type="button" id="yt-toggle-comments-pill" class="yt-toggle-comments-pill">
-            <span id="yt-comments-icon">💬</span>
+            <span id="yt-comments-icon">${SVG_CHAT}</span>
             <span id="yt-comments-text">কমেন্ট দেখুন (Show Comments)</span>
         </button>
     `;
@@ -782,11 +798,11 @@ function setupCommentsToggle() {
         if (isRevealed) {
             document.documentElement.setAttribute("data-comments-revealed", "false");
             textSpan.textContent = "কমেন্ট দেখুন (Show Comments)";
-            iconSpan.textContent = "💬";
+            iconSpan.innerHTML = SVG_CHAT;
         } else {
             document.documentElement.setAttribute("data-comments-revealed", "true");
             textSpan.textContent = "কমেন্ট হাইড করুন (Hide Comments)";
-            iconSpan.textContent = "🙈";
+            iconSpan.innerHTML = SVG_EYE_OFF;
             commentsSection.scrollIntoView({ behavior: "smooth", block: "start" });
         }
     });
@@ -845,7 +861,16 @@ function checkDailyStrictLimit(todaySec) {
                     banner.className = "yt-emergency-pass-banner";
                     document.body.prepend(banner);
                 }
-                banner.innerHTML = `<span>⚠️ জরুরি ৫ মিনিট পাস সক্রিয়: আর <b>${remPassMin} মিনিট</b> বাকি আছে</span>`;
+                banner.innerHTML = `
+                    <span style="display:inline-flex; align-items:center; gap:6px;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                            <line x1="12" y1="9" x2="12" y2="13"></line>
+                            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                        </svg>
+                        <span>জরুরি ৫ মিনিট পাস সক্রিয়: আর <b>${remPassMin} মিনিট</b> বাকি আছে</span>
+                    </span>
+                `;
             } else {
                 // কোনো পাস নেই! স্ট্রিক্ট লক স্ক্রিন কার্যকর করা
                 const banner = document.getElementById("yt-emergency-pass-banner");
@@ -865,14 +890,25 @@ function checkDailyStrictLimit(todaySec) {
 
                     overlay.innerHTML = `
                         <div class="yt-strict-lock-card">
-                            <div class="yt-lock-icon-halo">🛑</div>
+                            <div class="yt-lock-icon-halo">
+                                <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
                             <h2 class="yt-strict-lock-title">আজকের দৈনিক সীমা পূর্ণ হয়েছে</h2>
                             <p class="yt-strict-lock-subtext">
                                 আপনি আজকের জন্য নির্ধারিত <b>${limitMin >= 60 ? (limitMin / 60) + ' ঘণ্টা' : limitMin + ' মিনিট'}</b> ইউটিউব ব্যবহারের সীমা অতিক্রম করেছেন। সময়কে এখন আরও প্রয়োজনীয় ও গঠনমূলক কাজে ব্যয় করুন।
                             </p>
                             
                             <div class="yt-strict-time-pill">
-                                <span>⏱️ আজকের মোট সময়: ${formatMinutes(sec)}</span>
+                                <span style="display:inline-flex; align-items:center; gap:5px;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    আজকের মোট সময়: ${formatMinutes(sec)}
+                                </span>
                             </div>
 
                             <div class="yt-strict-quote-box">
@@ -882,10 +918,18 @@ function checkDailyStrictLimit(todaySec) {
 
                             <div class="yt-strict-actions">
                                 <button type="button" class="yt-strict-btn yt-strict-btn-emergency" id="yt-btn-emergency-pass">
-                                    ⏱️ জরুরি ৫ মিনিট পাস
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px; vertical-align:-2px;">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <polyline points="12 6 12 12 16 14"></polyline>
+                                    </svg>
+                                    <span>জরুরি ৫ মিনিট পাস</span>
                                 </button>
                                 <button type="button" class="yt-strict-btn yt-strict-btn-close" id="yt-btn-close-tab">
-                                    ❌ হোমপেজে যান
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px; vertical-align:-2px;">
+                                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                                    </svg>
+                                    <span>হোমপেজে যান</span>
                                 </button>
                             </div>
                         </div>
@@ -959,10 +1003,18 @@ function showPomodoroCompletedModal(mode) {
     modal.className = "yt-break-modal-overlay";
 
     const isWorkDone = mode === "work";
+    const modalIconSvg = isWorkDone
+        ? `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+        : `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+
+    const actionBtnSvg = isWorkDone
+        ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px; vertical-align:-2px;"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>বিরতি শুরু করুন`
+        : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px; vertical-align:-2px;"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>ফোকাস শুরু করুন`;
+
     modal.innerHTML = `
         <div class="yt-break-card" style="border-left-color: ${isWorkDone ? '#ef4444' : '#10b981'};">
             <div class="yt-break-header">
-                <span style="font-size: 20px;">${isWorkDone ? '🍅' : '☕'}</span>
+                <span style="display:inline-flex; align-items:center;">${modalIconSvg}</span>
                 <h4 class="yt-break-title">${isWorkDone ? 'পোমোডোরো সেশন সম্পন্ন!' : 'বিরতি শেষ!'}</h4>
             </div>
             <p class="yt-break-desc">
@@ -973,7 +1025,7 @@ function showPomodoroCompletedModal(mode) {
             <div class="yt-break-actions">
                 <button type="button" class="yt-break-btn yt-break-btn-secondary" id="yt-pomo-modal-dismiss">ঠিক আছে</button>
                 <button type="button" class="yt-break-btn yt-break-btn-primary" id="yt-pomo-modal-action" style="background: ${isWorkDone ? '#10b981' : '#ef4444'};">
-                    ${isWorkDone ? '☕ বিরতি শুরু করুন' : '🍅 ফোকাস শুরু করুন'}
+                    ${actionBtnSvg}
                 </button>
             </div>
         </div>
@@ -1072,12 +1124,20 @@ function updateFloatingPomodoroPill() {
         const s = secondsLeft % 60;
         const timeStr = `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 
+        const floatModeIcon = mode === "break"
+            ? `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path></svg>`
+            : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>`;
+
+        const floatToggleIcon = state === "running"
+            ? `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`
+            : `<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+
         pill.innerHTML = `
             <span class="pomo-float-dot"></span>
-            <span>${mode === "break" ? '☕' : '🍅'}</span>
+            <span style="display:inline-flex; align-items:center;">${floatModeIcon}</span>
             <span class="pomo-float-time">${timeStr}</span>
             <button type="button" class="yt-pomo-float-btn" id="yt-pomo-float-toggle" title="${state === 'running' ? 'পজ করুন' : 'চালু করুন'}">
-                ${state === 'running' ? '❚❚' : '▶'}
+                ${floatToggleIcon}
             </button>
         `;
 
