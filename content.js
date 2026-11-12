@@ -559,6 +559,14 @@ function showBreakModal(mins) {
     });
 }
 
+function getLocalDateString() {
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${y}-${m}-${day}`;
+}
+
 function formatMinutes(seconds) {
     if (!seconds || seconds < 60) return "< 1m";
     const mins = Math.floor(seconds / 60);
@@ -593,7 +601,7 @@ const trackingInterval = setInterval(() => {
     }
 
     // লোকাল স্টোরেজে দৈনিক সময় আপডেট করা
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayStr = getLocalDateString();
     try {
         chrome.storage.local.get(["yt_today_date", "yt_today_seconds"], (res) => {
             if (!isExtensionValid()) return;
