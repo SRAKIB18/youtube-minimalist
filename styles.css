@@ -438,7 +438,27 @@ html[data-hide-next="true"] a.ytp-next-button {
     display: none !important;
 }
 
-/* 5.4 Hide Comments Section (unless revealed by inline button) */
+/* 5.4 Ad Blocker & Sponsored Element Hiding */
+html[data-block-ads="true"] ytd-ad-slot-renderer,
+html[data-block-ads="true"] ytd-in-feed-ad-layout-renderer,
+html[data-block-ads="true"] ytd-banner-promo-renderer,
+html[data-block-ads="true"] ytd-promoted-sparkles-web-renderer,
+html[data-block-ads="true"] ytd-promoted-video-renderer,
+html[data-block-ads="true"] ytd-player-legacy-desktop-watch-ads-renderer,
+html[data-block-ads="true"] .ytp-ad-overlay-container,
+html[data-block-ads="true"] .ytp-ad-message-container,
+html[data-block-ads="true"] .ytp-ad-progress-list,
+html[data-block-ads="true"] ytd-mealbar-promo-renderer,
+html[data-block-ads="true"] yt-mealbar-promo-renderer,
+html[data-block-ads="true"] ytd-popup-container:has(ytd-mealbar-promo-renderer),
+html[data-block-ads="true"] #masthead-ad,
+html[data-block-ads="true"] ytd-statement-banner-renderer,
+html[data-block-ads="true"] .ytd-merch-shelf-renderer,
+html[data-block-ads="true"] tp-yt-paper-dialog:has(ytd-enforcement-message-view-model) {
+    display: none !important;
+}
+
+/* 5.5 Hide Comments Section (unless revealed by inline button) */
 html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-watch-flexy #comments,
 html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-watch-grid #comments,
 html[data-hide-comments="true"]:not([data-comments-revealed="true"]) ytd-comments,

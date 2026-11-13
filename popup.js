@@ -3,6 +3,7 @@ const toggleShorts = document.getElementById("toggleShorts");
 const toggleRelated = document.getElementById("toggleRelated");
 const toggleComments = document.getElementById("toggleComments");
 const toggleNextBtn = document.getElementById("toggleNextBtn");
+const toggleBlockAds = document.getElementById("toggleBlockAds");
 const toggleQuotes = document.getElementById("toggleQuotes");
 const selectInterval = document.getElementById("selectInterval");
 const selectBreakInterval = document.getElementById("selectBreakInterval");
@@ -123,7 +124,9 @@ function updateBadge() {
     const isAnyActive = (toggleFeed && toggleFeed.checked) ||
                         (toggleShorts && toggleShorts.checked) ||
                         (toggleRelated && toggleRelated.checked) ||
-                        (toggleComments && toggleComments.checked);
+                        (toggleComments && toggleComments.checked) ||
+                        (toggleNextBtn && toggleNextBtn.checked) ||
+                        (toggleBlockAds && toggleBlockAds.checked);
     if (isAnyActive) {
       if (textEl) textEl.textContent = "ACTIVE";
       statusPill.classList.remove("inactive");
@@ -184,6 +187,7 @@ chrome.storage.sync.get([
   "hideRelated",
   "hideComments",
   "hideNextBtn",
+  "blockAds",
   "showQuotes",
   "autoInterval",
   "breakInterval",
@@ -197,6 +201,7 @@ chrome.storage.sync.get([
   if (toggleRelated) toggleRelated.checked = data.hideRelated !== false;
   if (toggleComments) toggleComments.checked = data.hideComments !== false;
   if (toggleNextBtn) toggleNextBtn.checked = data.hideNextBtn !== false;
+  if (toggleBlockAds) toggleBlockAds.checked = data.blockAds !== false;
   if (toggleQuotes) toggleQuotes.checked = data.showQuotes !== false;
   if (selectInterval) {
     selectInterval.value = data.autoInterval !== undefined ? String(data.autoInterval) : "10";
@@ -266,7 +271,13 @@ if (toggleComments) {
 
 if (toggleNextBtn) {
   toggleNextBtn.addEventListener("change", () => {
-    chrome.storage.sync.set({ hideNextBtn: toggleNextBtn.checked });
+    chrome.storage.sync.set({ hideNextBtn: toggleNextBtn.checked }, updateBadge);
+  });
+}
+
+if (toggleBlockAds) {
+  toggleBlockAds.addEventListener("change", () => {
+    chrome.storage.sync.set({ blockAds: toggleBlockAds.checked }, updateBadge);
   });
 }
 

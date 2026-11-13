@@ -6,6 +6,7 @@ let settings = {
     hideRelated: true,
     hideComments: true,
     hideNextBtn: true,
+    blockAds: true,
     showQuotes: true,
     autoInterval: 10,
     breakInterval: 30,
@@ -315,6 +316,7 @@ function updateAttributes() {
     document.documentElement.setAttribute("data-hide-related", settings.hideRelated ? "true" : "false");
     document.documentElement.setAttribute("data-hide-comments", settings.hideComments ? "true" : "false");
     document.documentElement.setAttribute("data-hide-next", settings.hideNextBtn ? "true" : "false");
+    document.documentElement.setAttribute("data-block-ads", settings.blockAds ? "true" : "false");
     document.documentElement.setAttribute("data-show-quotes", settings.showQuotes ? "true" : "false");
 }
 
@@ -329,6 +331,7 @@ chrome.storage.sync.get([
     "hideRelated",
     "hideComments",
     "hideNextBtn",
+    "blockAds",
     "showQuotes",
     "autoInterval",
     "breakInterval",
@@ -342,6 +345,7 @@ chrome.storage.sync.get([
     if (data.hideRelated !== undefined) settings.hideRelated = data.hideRelated;
     if (data.hideComments !== undefined) settings.hideComments = data.hideComments;
     if (data.hideNextBtn !== undefined) settings.hideNextBtn = data.hideNextBtn;
+    if (data.blockAds !== undefined) settings.blockAds = data.blockAds;
     if (data.showQuotes !== undefined) settings.showQuotes = data.showQuotes;
     if (data.autoInterval !== undefined) settings.autoInterval = data.autoInterval;
     if (data.breakInterval !== undefined) settings.breakInterval = data.breakInterval;
@@ -367,6 +371,7 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
             setupCommentsToggle();
         }
         if (changes.hideNextBtn !== undefined) settings.hideNextBtn = changes.hideNextBtn.newValue;
+        if (changes.blockAds !== undefined) settings.blockAds = changes.blockAds.newValue;
         if (changes.showQuotes !== undefined) settings.showQuotes = changes.showQuotes.newValue;
         if (changes.autoInterval !== undefined) {
             settings.autoInterval = changes.autoInterval.newValue;
@@ -1253,6 +1258,9 @@ const observer = new MutationObserver(() => {
         if (settings.hideComments && !document.getElementById("yt-toggle-comments-pill")) {
             setupCommentsToggle();
         }
+        if (settings.blockAds) {
+            handleYouTubeAds();
+        }
     }
 });
 
@@ -1260,5 +1268,66 @@ observer.observe(document.documentElement, {
     childList: true,
     subtree: true
 });
+
+// ==========================================================================
+// SMART AD SKIPPER & FAST-FORWARD ENGINE (Anti-Adblock Safe)
+// ==========================================================================
+function handleYouTubeAds() {
+    if (!settings.blockAds) return;
+
+    // 1. Skip Ad Buttons (Click immediately when visible)
+    const skipSelectors = [
+        ".ytp-skip-ad-button",
+        ".ytp-ad-skip-button",
+        ".ytp-ad-skip-button-modern",
+        "button.ytp-ad-skip-button",
+        ".videoAdUiSkipButton",
+        ".ytp-ad-skip-button-slot button",
+        ".ytp-ad-overlay-close-button",
+        "[id^='skip-button:'] button",
+        "button[class*='skip-button']"
+    ];
+
+    for (let i = 0; i < skipSelectors.length; i++) {
+        const btn = document.querySelector(skipSelectors[i]);
+        if (btn && btn.offsetParent !== null) {
+            btn.click();
+            break;
+        }
+    }
+
+    // 2. Video Player In-Stream Ads (Fast-Forward to end & Mute)
+    const player = document.querySelector("#movie_player, .html5-video-player");
+    if (player) {
+        const isAdShowing = player.classList.contains("ad-showing") || player.classList.contains("ad-interrupting");
+        if (isAdShowing) {
+            const video = player.querySelector("video");
+            if (video) {
+                if (!video.muted) video.muted = true;
+                video.playbackRate = 16;
+                if (isFinite(video.duration) && video.duration > 0 && video.currentTime < video.duration - 0.1) {
+                    video.currentTime = video.duration;
+                }
+            }
+        }
+    }
+
+    // 3. Dismiss any anti-adblock modal or dialog
+    const dismissBtn = document.querySelector("ytd-enforcement-message-view-model #dismiss-button button, tp-yt-paper-dialog #dismiss-button button");
+    if (dismissBtn) {
+        dismissBtn.click();
+    }
+}
+
+// 250ms পর পর ভিডিও অ্যাড চেক ও স্কিপ করা
+const adSkipInterval = setInterval(() => {
+    if (!isExtensionValid()) {
+        clearInterval(adSkipInterval);
+        return;
+    }
+    if (window.location.pathname.startsWith("/watch")) {
+        handleYouTubeAds();
+    }
+}, 250);
 
 applyFocusMode();

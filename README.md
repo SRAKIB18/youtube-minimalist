@@ -22,6 +22,7 @@ YouTube's homepage and endless Shorts feed are engineered to keep you hooked and
   - **No End-Screen Overlays:** Blocks annoying thumbnail cards blocking the final seconds of videos.
   - **Hidden Comments with Quick Toggle:** Comments are hidden by default; click the sleek inline button `"💬 কমেন্ট দেখুন"` anytime if you wish to read them.
   - **No Next Video Temptation:** Hides the Next button (`.ytp-next-button`) in player controls and disables the `Shift+N` shortcut.
+  - **Smart Ad Blocker & Auto-Skip:** Automatically mutes and fast-forwards in-stream video ads at 16x speed, clicks "Skip" buttons instantly, and blocks sponsored banners safely without triggering anti-adblock detections.
 - 🔍 **Top Search Bar Preserved:** Only the top search bar is visible, keeping the interface minimal and distraction-free.
 - 📖 **70+ Sahih Hadith Collection (বাংলায় ৭০+ সহীহ হাদিস):** Displays authentic, motivational Hadith on time management, hard work, patience, and intentional focus.
 - ⏱️ **Auto-Rotating Hadith Timer (স্বয়ংক্রিয় পরিবর্তন):** Automatically rotates Hadiths every 5s, 10s, 15s, 30s, or 1m — customizable via popup with hover-pause protection!
@@ -97,6 +98,7 @@ Click the extension icon in your Chrome toolbar to open the control panel:
 - **Hide Related Videos:** Toggle sidebar suggested videos and end-screen video overlay cards on watch pages.
 - **Hide Comments:** Toggle the comments section under videos (also toggleable inline on the video page).
 - **Hide Next Video Button:** Toggle player Next button (`.ytp-next-button`) and block the `Shift+N` shortcut.
+- **Block & Skip Ads:** Toggle smart video ad fast-forwarding, instant auto-skipping, and banner ad removal.
 - **Daily Hadith:** Toggle to show or hide the daily inspiring Hadith card on the homepage.
 - **Auto-Rotate Interval:** Choose Hadith rotation frequency (5s, 10s, 15s, 30s, 1m, or Off).
 - **Pomodoro Timer:** Fully customizable focus intervals (15m–60m) and break intervals (3m–15m) with start, pause, reset, and mode-switch controls.
