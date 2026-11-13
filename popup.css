@@ -646,6 +646,11 @@ input:checked + .slider::before {
   gap: 6px;
 }
 
+.label-title svg {
+  flex-shrink: 0;
+  display: block;
+}
+
 .label-desc {
   font-size: 10.5px;
   color: var(--text-secondary);
